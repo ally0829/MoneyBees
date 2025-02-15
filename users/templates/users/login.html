@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - MoneyBees</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body class="login-page">
+    <div class="container">
+        <!-- 左側區塊 -->
+        <div class="left-panel">
+            <img src="{% static 'images/moneybees-logo.png' %}" alt="MoneyBees Logo">
+            <h1>MoneyBees</h1>
+            <p>Smart Tracking, Sweet Saving</p>
+        </div>
+
+        <!-- 右側區塊 -->
+        <div class="right-panel">
+            <h2>Login</h2>
+            <form method="POST">
+                {% csrf_token %}
+
+                <label>Email address</label>
+                <div class="input-group">
+                    <span class="icon">📧</span>
+                    {{ form.username }}
+                </div>
+
+                <label>Password</label>
+                <div class="input-group">
+                    <span class="icon">🔒</span>
+                    {{ form.password }}
+                </div>
+
+                <button type="submit" class="btn-primary">Sign in</button>
+
+                <p>Don't have an account? <a href="{% url 'signup' %}">Sign up here</a></p>
+
+                <div class="separator">Or</div>
+
+                <button class="btn-google">
+                    <img src="{% static 'images/google-icon.png' %}" alt="Google Icon"> Sign in with Google
+                </button>
+
+                <a href="{% url 'password_reset' %}" class="forgot-password">Forgot your password?</a>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
