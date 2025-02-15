@@ -38,8 +38,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'users',
-    'finance'
+
+
+    "users",
+    "finance",
+
 
     # google login functionality needs to be checked
     # Django allauth

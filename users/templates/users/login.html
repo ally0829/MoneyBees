@@ -6,15 +6,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - MoneyBees</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Agbalumo&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
 
 <body class="login-page">
     <div class="container">
         <div class="left-panel">
             <img src="{% static 'images/moneybees-logo.png' %}" alt="MoneyBees Logo">
-            <h1>MoneyBees</h1>
-            <p>Smart Tracking, Sweet Saving</p>
+            <h1 class="brand-title">MoneyBees</h1>
+            <p class="tagline">Smart Tracking, Sweet Saving</p>
         </div>
 
         <div class="right-panel">
@@ -36,14 +38,12 @@
 
                 <button type="submit" class="btn-primary">Sign in</button>
 
-                <p>Don't have an account? <a href="{% url 'signup' %}">Sign up here</a></p>
-
-                <div class="separator">Or</div>
+                <p class="signup-text">Don't have an account? <a href="{% url 'signup' %}">Sign up here</a></p>
+                <!--<div class="separator">Or</div>-->
 
                 <button class="btn-google">
                     <img src="{% static 'images/google-icon.png' %}" alt="Google Icon"> Sign in with Google
                 </button>
-
                 <a href="{% url 'password_reset' %}" class="forgot-password">Forgot your password?</a>
             </form>
         </div>
