@@ -4,4 +4,4 @@ from django.contrib.auth import login
 
 def login_view(request):
     # renders the base html for now, should change it to login.html when created, base html is for extensions only!
-    return render(request, 'base.html') 
+    return render(request, 'finance/sidebar.html') 
