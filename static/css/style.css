@@ -79,7 +79,6 @@ label {
     margin-bottom: 15px;
 }
 
-/* 輸入框內的文字 */
 .input-group input {
     flex: 1;
     background: none;
