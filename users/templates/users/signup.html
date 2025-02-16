@@ -21,6 +21,19 @@
             <form method="POST">
                 {% csrf_token %}
 
+                <!-- 顯示表單錯誤 -->
+                {% if form.errors %}
+                <div class="error-messages">
+                    <ul>
+                        {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                        <li>{{ field|title }}: {{ error }}</li>
+                        {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
                 <label>First Name</label>
                 <div class="input-group">
                     <span class="icon">👤</span>
@@ -42,7 +55,7 @@
                 <label>Password</label>
                 <div class="input-group">
                     <span class="icon">🔒</span>
-                    {{ form.password }}
+                    {{ form.password1 }}
                 </div>
 
                 <label>Confirm Password</label>
@@ -54,13 +67,6 @@
                 <button type="submit" class="btn-primary">Sign up</button>
 
                 <p>Already have an account? <a href="{% url 'login' %}" class="signin-link">Sign in</a></p>
-                <!--
-                <div class="separator">Or</div>
-
-                <button class="btn-google">
-                    <img src="{% static 'images/google-icon.png' %}" alt="Google Icon"> Sign in with Google
-                </button>
-            -->
             </form>
         </div>
 

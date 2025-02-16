@@ -148,3 +148,5 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your-email@gmail.com'  # need to be changed
 EMAIL_HOST_PASSWORD = 'your-email-password'  # need to be changed
 DEFAULT_FROM_EMAIL = 'noreply@yourdomain.com'
+
+AUTH_USER_MODEL = 'users.User'

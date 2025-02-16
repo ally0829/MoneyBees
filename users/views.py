@@ -8,9 +8,9 @@ def signup_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            user = form.save()  # save the valid form and create the user object
             login(request, user)
-            return redirect('home')
+            return redirect('home')  # redirect to home page
     else:
         form = SignUpForm()
     return render(request, 'users/signup.html', {'form': form})
