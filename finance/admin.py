@@ -7,4 +7,3 @@ admin.site.register(Income)
 admin.site.register(ExpenseCategory)
 admin.site.register(Expense)
 admin.site.register(MonthlyExpenseTarget)
-
