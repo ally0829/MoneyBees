@@ -4,6 +4,7 @@
     grid-template-rows: 25% repeat(4, 20%);
     align-items: center; /* Ensures vertical alignment */
     margin-top:2%;
+    margin-left: 8%;
 }
 
 .profile img {
@@ -20,7 +21,7 @@
     font-weight: bold;
     background-color: #FEF8A0;
     border-radius: 1.2rem;
-    margin: 40px 0px 0px 64px;
+    margin: 0px 0px 0px 64px;
 }
 
 .profile-bar{

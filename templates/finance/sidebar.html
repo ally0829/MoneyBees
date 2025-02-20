@@ -8,6 +8,7 @@
 {% endblock %}
 
 
+
 {% block content %}
 
 <div class="display" >
@@ -107,8 +108,11 @@
     
     
     <main class="main">
+      {% if show_topbar %}
+       {% include "finance/topbar.html" %}
+      {% endif %}
 
-        {% block main %} {% endblock %}
+      {% block main %} {% endblock %}
     </main> 
 </div>
 
