@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Expense Record{% endblock %}
+
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/expenseRecord.css' %}">
+
+<!-- Google Fonts Merriweather -->
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+<div class="display">
+    <nav class="sidebar">
+        {% include "finance/sidebar.html" %}
+    </nav>
+
+    <main class="main">
+        {% include "finance/topbar.html" %}
+
+        <div class="expense-container">
+            <h2>Expense Record</h2>
+
+            <div class="date-filter">
+                <label for="start_date">Date from:</label>
+                <input type="date" id="start_date" name="start_date">
+                <label for="end_date">to</label>
+                <input type="date" id="end_date" name="end_date">
+
+                <label for="category">Category</label>
+                <select id="category" name="category">
+                    <option value="ALL">ALL</option>
+                    {% for category in categories %}
+                    <option value="{{ category.name }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <button id="search-btn" class="search-btn">Search</button>
+            </div>
+
+            <table class="expense-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Notes</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.category }}</td>
+                        <td>{{ expense.date }}</td>
+                        <td>{{ expense.amount }}</td>
+                        <td>{{ expense.notes }}</td>
+                        <td>
+                            <button class="edit-btn">EDIT</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+<script>
+    document.getElementById("search-btn").addEventListener("click", function () {
+        let startDate = document.getElementById("start_date").value;
+        let endDate = document.getElementById("end_date").value;
+        let category = document.getElementById("category").value;
+
+        let url = `/finance/expense_record/?start_date=${startDate}&end_date=${endDate}&category=${category}`;
+        window.location.href = url;
+    });
+</script>
