@@ -11,7 +11,7 @@
 <div class="container">
     <h1>Create upcoming payment!!</h1>
     <div class="upcoming-expense">
-        <!-- 左側：表單 -->
+        <!-- Page left -->
         <div class="expense-form">
             <form id="expense-form">
                 <label for="date">Select Date</label>
@@ -37,7 +37,7 @@
             </form>
         </div>
 
-        <!-- 右側：表格 -->
+        <!-- Page right -->
         <div class="expense-list">
             <table>
                 <thead>
@@ -58,7 +58,7 @@
 </div>
 
 <script>
-    // 紀錄當前編輯的行 (如果是 null 表示是新增)
+    // record current row
     let editingRow = null;
 
     document.getElementById("expense-form").addEventListener("submit", function(event) {

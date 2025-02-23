@@ -56,11 +56,11 @@ class MonthlyExpenseTarget(models.Model):
 
 
 class UpcomingPayment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # ✅ 紀錄是哪個使用者的付款
-    category = models.ForeignKey(ExpenseCategory, on_delete=models.CASCADE)  # ✅ 付款類別
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  
+    category = models.ForeignKey(ExpenseCategory, on_delete=models.CASCADE)  
     date = models.DateField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    description = models.TextField(blank=True, null=True)  # ✅ 可選的描述欄位
+    description = models.TextField(blank=True, null=True) 
 
     def __str__(self):
         return f"{self.user.firstname} - {self.category.name} - {self.amount} on {self.date}"
