@@ -33,7 +33,7 @@ class Expense(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(ExpenseCategory, on_delete=models.CASCADE)
     amount = models.IntegerField()
-    date = models.DateField()
+    date = models.DateField(db_index=True)
     description = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:

@@ -36,7 +36,7 @@ body {
 
 .expense-table th,
 .expense-table td {
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     padding: 10px;
     text-align: left;
 
@@ -46,6 +46,16 @@ body {
     background-color: #FFEB85;
     font-weight: bold;
 }
+
+.expense-table tfoot td.total-row {
+    text-align: left;
+    font-size: 18px;
+    padding: 12px;
+    border-top: 2px solid #ccc;
+    border-bottom: 2px solid #ccc;
+    background-color: #FFEB85;
+}
+
 
 .date-filter label,
 .date-filter select,

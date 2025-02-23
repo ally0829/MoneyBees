@@ -45,7 +45,7 @@
                         <th>Category</th>
                         <th>Date</th>
                         <th>Amount</th>
-                        <th>Notes</th>
+                        <th>Description</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -55,26 +55,59 @@
                         <td>{{ expense.category }}</td>
                         <td>{{ expense.date }}</td>
                         <td>{{ expense.amount }}</td>
-                        <td>{{ expense.notes }}</td>
+                        <td>{{ expense.description }}</td>
                         <td>
                             <button class="edit-btn">EDIT</button>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2"><strong>Total Amount:</strong></td>
+                        <td><strong>${{ total_amount }}</strong></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </main>
 </div>
-{% endblock %}
 
 <script>
-    document.getElementById("search-btn").addEventListener("click", function () {
-        let startDate = document.getElementById("start_date").value;
-        let endDate = document.getElementById("end_date").value;
-        let category = document.getElementById("category").value;
+    document.addEventListener("DOMContentLoaded", function () {
+        let searchBtn = document.getElementById("search-btn");
 
-        let url = `/finance/expense_record/?start_date=${startDate}&end_date=${endDate}&category=${category}`;
-        window.location.href = url;
+        if (!searchBtn) {
+            console.error("❌ Error: Cannot find #search-btn");
+            return;
+        }
+
+        console.log("find Search button, start listening Click event");
+
+        // to make sure the filter will not be reset
+        const urlParams = new URLSearchParams(window.location.search);
+        document.getElementById("start_date").value = urlParams.get("start_date") || "";
+        document.getElementById("end_date").value = urlParams.get("end_date") || "";
+        document.getElementById("category").value = urlParams.get("category") || "ALL";
+
+
+        searchBtn.addEventListener("click", function () {
+            let startDate = document.getElementById("start_date").value;
+            let endDate = document.getElementById("end_date").value;
+            let category = document.getElementById("category").value;
+            let encodedCategory = encodeURIComponent(category);
+
+            console.log("🔍 Search clicked:", { startDate, endDate, category });
+
+            let url = `/finance/expense-record/?start_date=${startDate}&end_date=${endDate}&category=${encodedCategory}`;
+            console.log("🔍 Redirecting to:", url);
+            window.location.href = url;
+        });
     });
 </script>
+
+
+
+{% endblock %}
