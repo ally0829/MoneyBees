@@ -1,0 +1,68 @@
+.form_container{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.add_income_expense {
+    background-color: #FFF;
+    border-radius: 12px;
+    padding: 25px;
+    width: 65%;
+    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
+    border: 2px solid #CB9E46;
+    text-align: center;
+}
+
+.add_income_expense h2 {
+    background-color: #CB9E46;
+    color: white;
+    padding: 12px;
+    margin: -25px -25px 20px -25px;
+    border-radius: 10px 10px 0 0;
+    font-size: 20px;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    text-align: left;
+    margin: 10px 0 5px;
+    color: #CB9E46;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 3px;
+    border: 2px solid #CB9E46;
+    border-radius: 6px;
+    background-color: #FFF9E3;
+    font-size: 14px;
+}
+
+input:focus, select:focus {
+    border-color: #CB9E46;
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #CB9E46;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #CB9E46;
+}

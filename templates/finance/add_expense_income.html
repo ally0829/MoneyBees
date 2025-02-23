@@ -1,0 +1,35 @@
+{% extends "finance/sidebar.html" %} 
+
+{% block style %}
+  <!-- Load static files -->
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/income_expense_input.css' %}">
+  
+  {{ block.super }}
+{% endblock %}
+
+{% block main %}
+<div class="form_container">
+  <div class="add_income_expense">
+    {% if type == "income" %}
+    <h2>Add Income</h2>
+    <form method="post" action="{% url 'finance:add_income' %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary">Add Income</button>
+    </form>
+    {% else %}
+    <h2>Add Expense</h2>
+    <form method="post" action="{% url 'finance:add_expense' %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary">Add Expense</button>
+    </form>
+    {% endif %}
+    
+  </div>
+</div>
+
+{% endblock %} 
+
+

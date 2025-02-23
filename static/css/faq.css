@@ -1,0 +1,68 @@
+
+.faq {
+    text-align: center;
+    margin-top: 30px;
+}
+
+
+.faq img {
+    max-width: 200px; /* Adjust image size */
+} 
+
+.accordion {
+    width: 80%;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.brand-title {
+    font-family: 'Bagel Fat One', cursive;
+    font-weight: bold;
+    font-size: 32px;
+    margin-top: 10px;
+}
+
+.accordion-button {
+    background-color: #000 !important;
+    color: white !important;
+    font-weight: bold;
+    border-radius: 10px !important;
+    padding: 15px;
+}
+
+.accordion-button:focus {
+    box-shadow: none !important;
+}
+
+.accordion-button:not(.collapsed) {
+    color: white;
+    background-color: #000 !important;
+}
+
+
+.accordion-item{
+    background-color: #FFDC00;
+    border-color: transparent;
+}
+
+.accordion-body {
+    background-color: #FFDC00;
+    color: black;
+    border-radius: 5px;
+    padding: 15px;
+    text-align: left;
+} 
+
+/* Remove Bootstrap default icon */
+.accordion-button::after {
+    background-image: none !important;
+    content: "+";
+    font-size: 18px;
+    color: #FFDC00; /* Change to your desired color */
+}
+
+/* Change icon when expanded */
+.accordion-button:not(.collapsed)::after {
+    content: "−";
+    color: white; /* Keep color consistent */
+}
