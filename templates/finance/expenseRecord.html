@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "finance/sidebar.html" %}
 {% block title %}Expense Record{% endblock %}
 
 {% block style %}
@@ -7,18 +7,13 @@
 
 <!-- Google Fonts Merriweather -->
 <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+{{ block.super }}
 {% endblock %}
 
 
-{% block content %}
-<div class="display">
-    <nav class="sidebar">
-        {% include "finance/sidebar.html" %}
-    </nav>
-
-    <main class="main">
-        {% include "finance/topbar.html" %}
-
+{% block main %}
+<div>
+    <main>
         <div class="expense-container">
             <h2>Expense Record</h2>
 

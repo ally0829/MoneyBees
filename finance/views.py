@@ -46,4 +46,5 @@ def expense_record_view(request):
         'categories': categories,
         'expenses': expenses,
         'total_amount': total_amount,
+        "show_topbar": True
     })

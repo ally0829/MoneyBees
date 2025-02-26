@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Agbalumo&display=swap');
 
-body,
+/* body,
 html {
     margin: 0;
     padding: 0;
@@ -9,7 +9,7 @@ html {
     height: 100vh;
     overflow: hidden;
     display: flex;
-}
+} */
 
 .container {
     display: flex;
