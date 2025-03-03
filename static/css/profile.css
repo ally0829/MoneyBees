@@ -1,150 +1,128 @@
 .profile{
-    display: grid;
-    grid-template-columns: 75%;
-    grid-template-rows: 25% repeat(4, 20%);
-    align-items: center; /* Ensures vertical alignment */
-    margin-top:2%;
-    margin-left: 8%;
+  display: grid;
+  grid-template-columns: 75%;
+  grid-template-rows: 25% repeat(4, 20%);
+  align-items: center; /* Ensures vertical alignment */
+  margin-top:2%;
+  margin-left: 8%;
 }
 
-<<<<<<< HEAD
 .profile .logo {
-=======
-.profile img {
->>>>>>> 03032025
-    grid-column: 2; /* Place image in the second column */
-    grid-row: 1 / span 5; /* Make the image span all 5 rows */
-    align-self: center; /* Centers the image vertically */
-    padding-top: 72px;
+  grid-column: 2; /* Place image in the second column */
+  grid-row: 1 / span 5; /* Make the image span all 5 rows */
+  align-self: center; /* Centers the image vertically */
+  padding-top: 72px;
 }
 
 .profile-fullName {
-    align-items: center;
-    display: flex;
-    font-size: 56px;
-    font-weight: bold;
-    background-color: #FEF8A0;
-    border-radius: 1.2rem;
-    margin: 0px 0px 0px 64px;
+  align-items: center;
+  display: flex;
+  font-size: 56px;
+  font-weight: bold;
+  background-color: #FEF8A0;
+  border-radius: 1.2rem;
+  margin: 0px 0px 0px 64px;
 }
 
-<<<<<<< HEAD
-=======
-.profile-bar{
-    display: flex;
-    place-items: center;
-    background-color: black;
-    color: white;
-    margin: 40px 0px 0px 64px;
-    padding: 1rem;
-    font-size: 24px;
-    border-radius: 1.2rem;
-}
-
->>>>>>> 03032025
 .profile-bar div{
-    padding-left: 28px;
+  padding-left: 28px;
 }
 
 .profile-bar svg{
-    margin-left: 28px;
-<<<<<<< HEAD
+  margin-left: 28px;
 }
 
 .black-textBox div{
-    margin-left:40px;    
-    text-decoration: none;
-    color: white;
-    font-weight: bold;
+  margin-left:40px;    
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
 }
 
 
 dialog{
-    padding: 1rem 3rem;
-	background: white;
-	max-width: 400px;
-	padding-top: 2rem;
-	border-radius: 20px;
-	border: 0;
-	box-shadow: 0 5px 30px 0 rgb(0 0 0 / 10%);
-	animation: fadeIn 1s ease both;
-	&::backdrop {
-		animation: fadeIn 1s ease both;
-		/* background: rgb(255 255 255 / 40%); */
-		z-index: 2;
-		/* backdrop-filter: blur(20px); */
-    }
+  padding: 1rem 3rem;
+background: white;
+max-width: 400px;
+padding-top: 2rem;
+border-radius: 20px;
+border: 0;
+box-shadow: 0 5px 30px 0 rgb(0 0 0 / 10%);
+animation: fadeIn 1s ease both;
+&::backdrop {
+  animation: fadeIn 1s ease both;
+  /* background: rgb(255 255 255 / 40%); */
+  z-index: 2;
+  /* backdrop-filter: blur(20px); */
+  }
 }
 
 dialog #closeNotifDialogBtn{
-    border: none;
-    float: inline-end;
-    background-color: white;
-    /* font-weight: bold; */
-    font-size: 20px;
+  border: none;
+  float: inline-end;
+  background-color: white;
+  /* font-weight: bold; */
+  font-size: 20px;
 }
 
 /* toggle button */
 .switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-  }
-  
-  .switch input { 
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  input:checked + .slider {
-    background-color: #2196F3;
-  }
-  
-  input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-  }
-  
-  input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
-  }
-
-  
-
-  .slider.round {
-    border-radius: 34px;
-  }
-  
-  .slider.round:before {
-    border-radius: 50%;
-  }
-=======
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
 }
->>>>>>> 03032025
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
