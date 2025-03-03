@@ -4,11 +4,13 @@ from django.db import models
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, firstname, lastname, password=None):
+        """Create and return a regular user with email and password."""
         if not email:
             raise ValueError("Users must have an email address")
         user = self.model(email=self.normalize_email(email),
                           firstname=firstname, lastname=lastname)
         user.set_password(password)
+        user.is_active = True
         user.save(using=self._db)
         return user
 
@@ -22,6 +24,7 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    """Custom User model that replaces Django's default auth.User"""
     id = models.AutoField(primary_key=True)
     firstname = models.CharField(max_length=128)
     lastname = models.CharField(max_length=128)
