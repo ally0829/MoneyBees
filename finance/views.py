@@ -1,20 +1,14 @@
 from django.shortcuts import render
-<<<<<<< HEAD
 import json
-from django.shortcuts import render
 from django.conf import settings
-=======
-
 from finance.forms import IncomeForm, ExpenseForm
 from finance.models import Income, Expense, ExpenseCategory, MonthlyExpenseTarget, IncomeCategory, User
 
->>>>>>> 03032025
 
 # Create your views here.
 def profile_view(request):
     return render(request, 'finance/profile.html',{"show_topbar": False})
 
-<<<<<<< HEAD
 def settings_view(request):
      # Get the absolute path of the JSON file
     json_path = settings.DATA_DIR / 'currencies.json'
@@ -24,7 +18,7 @@ def settings_view(request):
         currencies = json.load(f)
 
     return render(request, 'finance/settings.html',{'currencies': currencies})
-=======
+
 def add_income(request):
     if request.method == 'POST':
         income_form = IncomeForm(request.POST)
@@ -72,4 +66,3 @@ def add_expense(request):
         "form": expense_form,
         "type": "expense"
     })
->>>>>>> 03032025

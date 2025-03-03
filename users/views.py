@@ -31,9 +31,6 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
-<<<<<<< HEAD
-=======
 
 def faq_view(request):
     return render(request, 'users/faq.html')
->>>>>>> 03032025
