@@ -25,6 +25,9 @@ def settings_view(request):
 
     return render(request, 'finance/settings.html',{'currencies': currencies})
 
+def faq_view(request):
+    return render(request, 'finance/faq.html')
+
 def add_income(request):
     if request.method == 'POST':
         income_form = IncomeForm(request.POST)
