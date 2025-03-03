@@ -1,23 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Agbalumo&display=swap');
 
-<<<<<<< HEAD
-/* body,
-=======
-body,
->>>>>>> 03032025
-html {
-    margin: 0;
-    padding: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-<<<<<<< HEAD
-} */
-=======
-}
->>>>>>> 03032025
 
 .container {
     display: flex;
@@ -191,7 +174,6 @@ label {
 
 .signin-link:hover {
     text-decoration: underline;
-<<<<<<< HEAD
 }
 
 .black-textBox{
@@ -203,6 +185,4 @@ label {
     padding: 1.4rem;
     font-size: 24px;
     border-radius: 1.2rem;
-=======
->>>>>>> 03032025
 }

@@ -5,8 +5,7 @@ from users.models import User
 class ExpenseCategory(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=128)
-    description = models.CharField(max_length=128)
-    
+
     class Meta:
         verbose_name_plural = "expense_category"
 
@@ -39,6 +38,7 @@ class Income(models.Model):
         return f"{self.user.firstname} - {self.amount}"
 
 
+
 class Expense(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -53,13 +53,14 @@ class Expense(models.Model):
     def __str__(self):
         return f"{self.user.firstname} - {self.amount} in {self.category.name}"
 
+
 class MonthlyExpenseTarget(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(ExpenseCategory, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     month = models.IntegerField()
-    
+
     class Meta:
         verbose_name_plural = "monthly_expense_target"
 

@@ -1,0 +1,94 @@
+body {
+    font-family: 'Merriweather', serif;
+}
+
+.expense-container h2 {
+    font-family: 'Merriweather', serif;
+    font-weight: 700;
+    font-size: 2rem;
+}
+
+
+.expense-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    padding: 20px;
+}
+
+.expense-table {
+    width: 90%;
+    max-width: 900px;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+}
+
+.expense-table thead {
+    background-color: #333;
+    color: white;
+    font-weight: bold;
+}
+
+.expense-table th,
+.expense-table td {
+    border: 2px solid #ccc;
+    padding: 10px;
+    text-align: left;
+
+}
+
+.expense-table tfoot {
+    background-color: #FFEB85;
+    font-weight: bold;
+}
+
+.expense-table tfoot td.total-row {
+    text-align: left;
+    font-size: 18px;
+    padding: 12px;
+    border-top: 2px solid #ccc;
+    border-bottom: 2px solid #ccc;
+    background-color: #FFEB85;
+}
+
+
+.date-filter label,
+.date-filter select,
+.date-filter input {
+    font-family: 'Merriweather', serif;
+    font-weight: 400;
+}
+
+.expense-table {
+    font-family: 'Merriweather', serif;
+    font-size: 16px;
+}
+
+.edit-btn {
+    font-family: 'Merriweather', serif;
+    font-weight: 600;
+    background-color: #FFD700;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.search-btn {
+    background-color: #000;
+    color: #FFDC00;
+    font-weight: bold;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.search-btn:hover {
+    background-color: #333;
+}

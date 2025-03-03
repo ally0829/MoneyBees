@@ -1,0 +1,108 @@
+{% extends "finance/sidebar.html" %}
+{% block title %}Expense Record{% endblock %}
+
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/expenseRecord.css' %}">
+
+<!-- Google Fonts Merriweather -->
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+{{ block.super }}
+{% endblock %}
+
+
+{% block main %}
+<div>
+    <main>
+        <div class="expense-container">
+            <h2>Expense Record</h2>
+
+            <div class="date-filter">
+                <label for="start_date">Date from:</label>
+                <input type="date" id="start_date" name="start_date">
+                <label for="end_date">to</label>
+                <input type="date" id="end_date" name="end_date">
+
+                <label for="category">Category</label>
+                <select id="category" name="category">
+                    <option value="ALL">ALL</option>
+                    {% for category in categories %}
+                    <option value="{{ category.name }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <button id="search-btn" class="search-btn">Search</button>
+            </div>
+
+            <table class="expense-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.category }}</td>
+                        <td>{{ expense.date }}</td>
+                        <td>{{ expense.amount }}</td>
+                        <td>{{ expense.description }}</td>
+                        <td>
+                            <button class="edit-btn">EDIT</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2"><strong>Total Amount:</strong></td>
+                        <td><strong>${{ total_amount }}</strong></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </main>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let searchBtn = document.getElementById("search-btn");
+
+        if (!searchBtn) {
+            console.error("❌ Error: Cannot find #search-btn");
+            return;
+        }
+
+        console.log("find Search button, start listening Click event");
+
+        // to make sure the filter will not be reset
+        const urlParams = new URLSearchParams(window.location.search);
+        document.getElementById("start_date").value = urlParams.get("start_date") || "";
+        document.getElementById("end_date").value = urlParams.get("end_date") || "";
+        document.getElementById("category").value = urlParams.get("category") || "ALL";
+
+
+        searchBtn.addEventListener("click", function () {
+            let startDate = document.getElementById("start_date").value;
+            let endDate = document.getElementById("end_date").value;
+            let category = document.getElementById("category").value;
+            let encodedCategory = encodeURIComponent(category);
+
+            console.log("🔍 Search clicked:", { startDate, endDate, category });
+
+            let url = `/finance/expense-record/?start_date=${startDate}&end_date=${endDate}&category=${encodedCategory}`;
+            console.log("🔍 Redirecting to:", url);
+            window.location.href = url;
+        });
+    });
+</script>
+
+
+
+{% endblock %}
