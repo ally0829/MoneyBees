@@ -16,7 +16,10 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+<<<<<<< HEAD
 DATA_DIR = BASE_DIR  / 'finance' / 'data'
+=======
+>>>>>>> 03032025
 
 
 # Quick-start development settings - unsuitable for production

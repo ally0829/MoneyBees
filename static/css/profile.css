@@ -7,7 +7,11 @@
     margin-left: 8%;
 }
 
+<<<<<<< HEAD
 .profile .logo {
+=======
+.profile img {
+>>>>>>> 03032025
     grid-column: 2; /* Place image in the second column */
     grid-row: 1 / span 5; /* Make the image span all 5 rows */
     align-self: center; /* Centers the image vertically */
@@ -24,12 +28,27 @@
     margin: 0px 0px 0px 64px;
 }
 
+<<<<<<< HEAD
+=======
+.profile-bar{
+    display: flex;
+    place-items: center;
+    background-color: black;
+    color: white;
+    margin: 40px 0px 0px 64px;
+    padding: 1rem;
+    font-size: 24px;
+    border-radius: 1.2rem;
+}
+
+>>>>>>> 03032025
 .profile-bar div{
     padding-left: 28px;
 }
 
 .profile-bar svg{
     margin-left: 28px;
+<<<<<<< HEAD
 }
 
 .black-textBox div{
@@ -126,3 +145,6 @@ dialog #closeNotifDialogBtn{
   .slider.round:before {
     border-radius: 50%;
   }
+=======
+}
+>>>>>>> 03032025

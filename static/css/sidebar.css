@@ -1,8 +1,13 @@
 /* Layout for the sidebar */
 .display {
   display: grid;
+<<<<<<< HEAD
   grid-template-columns: 16% 1fr;
   overflow-y: hidden;
+=======
+  grid-auto-columns: auto;
+  grid-template-columns: 300px 1fr;
+>>>>>>> 03032025
 }
 
 .sidebar {
@@ -50,6 +55,7 @@
   grid-column: 2;
   background-color: #FFDC00;
   height: 100vh;
+<<<<<<< HEAD
   overflow-y: scroll;
   scrollbar-width: none;  
 }
@@ -60,6 +66,8 @@
   height: 0px;
   display: none;
   background: transparent;
+=======
+>>>>>>> 03032025
 }
 
 .icon-container {
