@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Agbalumo&display=swap');
 
-body,
+/* body,
 html {
     margin: 0;
     padding: 0;
@@ -9,7 +9,7 @@ html {
     height: 100vh;
     overflow: hidden;
     display: flex;
-}
+} */
 
 .container {
     display: flex;
@@ -183,4 +183,15 @@ label {
 
 .signin-link:hover {
     text-decoration: underline;
+}
+
+.black-textBox{
+    display: flex;
+    place-items: center;
+    background-color: black;
+    color: white;
+    margin: 40px 0px 0px 64px;
+    padding: 1.4rem;
+    font-size: 24px;
+    border-radius: 1.2rem;
 }

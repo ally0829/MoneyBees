@@ -2,6 +2,7 @@
 .display {
   display: grid;
   grid-template-columns: 300px 1fr;
+  overflow-y: hidden;
 }
 
 .sidebar {
@@ -49,6 +50,16 @@
   grid-column: 2;
   background-color: #FFDC00;
   height: 100vh;
+  overflow-y: scroll;
+  scrollbar-width: none;  
+}
+
+/* Hide scrollbar in Chrome, Safari, and Edge */
+.main::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  display: none;
+  background: transparent;
 }
 
 .icon-container {
