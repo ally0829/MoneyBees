@@ -1,36 +1,37 @@
-{% extends "finance/sidebar.html" %} 
+{% extends "finance/sidebar.html" %}
 
 {% block style %}
-  {% load static %}
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap">
-  <link rel="stylesheet" href="{% static 'css/upcomingExpense.css' %}">
-  {{ block.super }}
+{% load static %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap">
+<link rel="stylesheet" href="{% static 'css/upcomingExpense.css' %}">
+{{ block.super }}
 {% endblock %}
 
 {% block main %}
 <div class="container">
     <h1>Create upcoming payment!!</h1>
     <div class="upcoming-expense">
-        <!-- 左側表單 -->
         <div class="expense-form">
             <form id="expense-form">
+                {% csrf_token %}
                 <input type="hidden" id="payment-id" name="payment_id"> <!-- store current user ID -->
-                
+
                 <label for="date">Select Date</label>
                 <input type="date" id="date" name="date" required>
 
                 <label for="category">Expense Category</label>
                 <select id="category" name="category">
                     {% for category in categories %}
-                        <option value="{{ category.id }}">{{ category.name }}</option>
-                    {% endfor %}                 
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
                 </select>
 
                 <label for="amount">Amount</label>
                 <input type="number" id="amount" name="amount" placeholder="$0.0" required>
 
                 <label for="description">Description</label>
-                <textarea id="description" name="description" placeholder="Add some description of the expense..."></textarea>
+                <textarea id="description" name="description"
+                    placeholder="Add some description of the expense..."></textarea>
 
                 <div class="form-buttons">
                     <button type="submit" id="save-btn">OK</button>
@@ -39,7 +40,6 @@
             </form>
         </div>
 
-        <!-- 右側表格 -->
         <div class="expense-list">
             <table>
                 <thead>
@@ -78,9 +78,13 @@
     function setupEventListeners() {
         document.getElementById("expense-form").addEventListener("submit", savePayment);
         document.querySelectorAll(".edit-btn").forEach(button => button.addEventListener("click", editPayment));
-        document.querySelectorAll(".paid-btn").forEach(button => button.addEventListener("click", function () {
-            alert("Paid functionality not implemented yet.");
-        }));
+        document.querySelectorAll(".paid-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const row = this.closest("tr");
+                const paymentId = row.getAttribute("data-id");
+                markAsPaid(paymentId, row);
+            });
+        });
     }
 
     async function savePayment(event) {
@@ -98,7 +102,10 @@
         let response = await fetch(url, {
             method: method,
             body: JSON.stringify({ date, category, amount, description }),
-            headers: { "Content-Type": "application/json" }
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken")
+            }
         });
 
         let result = await response.json();
@@ -122,7 +129,7 @@
 
         document.getElementById("payment-id").value = paymentId;
         document.getElementById("category").value = category;
-        document.getElementById("date").value = formatDate(date); 
+        document.getElementById("date").value = formatDate(date);
         document.getElementById("amount").value = amount;
         document.getElementById("description").value = description;
 
@@ -133,21 +140,61 @@
     }
 
     async function deletePayment(paymentId, row) {
-        let response = await fetch(`/finance/delete-payment/${paymentId}/`, { method: "DELETE" });
+        let response = await fetch(`/finance/delete-payment/${paymentId}/`, {
+            method: "DELETE",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken")
+            }
+        });
         let result = await response.json();
         if (result.message) {
             row.remove();
             resetForm();//after delete we need to reset 
         }
     }
+
+    async function markAsPaid(paymentId, row) {
+        if (confirm("Mark this payment as paid? It will be added to your expense record.")) {
+            let response = await fetch(`/finance/mark-payment-paid/${paymentId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                }
+            });
+
+            let result = await response.json();
+            if (result.message) {
+                alert(result.message);
+                row.remove(); // Remove from the upcoming payments list
+            }
+        }
+    }
+
     function resetForm() {
-    document.getElementById("payment-id").value = "";  
-    document.getElementById("date").value = "";
-    document.getElementById("category").value = "";
-    document.getElementById("amount").value = "";
-    document.getElementById("description").value = "";
-    document.getElementById("delete-btn").classList.add("hidden"); // 🔹 Delete button hidden
-    editingRow = null; // to ensure edit mode disapear
-}
+        document.getElementById("payment-id").value = "";
+        document.getElementById("date").value = "";
+        document.getElementById("category").value = "";
+        document.getElementById("amount").value = "";
+        document.getElementById("description").value = "";
+        document.getElementById("delete-btn").classList.add("hidden"); // 🔹 Delete button hidden
+        editingRow = null; // to ensure edit mode disapear
+    }
+
+    // Function to get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
 </script>
 {% endblock %}

@@ -228,7 +228,31 @@ def edit_upcoming_payment(request, payment_id):
             return JsonResponse({"error": str(e)}, status=400)
 
 
+def mark_payment_paid(request, payment_id):
+    if request.method == 'POST':
+        # Get the upcoming payment
+        payment = get_object_or_404(UpcomingPayment, id=payment_id)
+
+        # Create a new expense record from this payment
+        expense = Expense(
+            user=payment.user,
+            category=payment.category,
+            amount=payment.amount,
+            date=datetime.now().date(),
+            description=f"{payment.description}"
+        )
+        expense.save()
+
+        # Delete the upcoming payment
+        payment.delete()
+
+        return JsonResponse({'message': 'Payment marked as paid and added to expenses'})
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
 #  API: delete Upcoming Payment
+
+
 @csrf_exempt
 @login_required
 def delete_upcoming_payment(request, payment_id):
