@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import profile_view, add_income, add_expense, settings_view, expense_record_view, upcomingExpense_view, add_upcoming_payment, edit_upcoming_payment, delete_upcoming_payment, faq_view, home_view
+from .views import edit_expense, delete_expense, profile_view, add_income, add_expense, settings_view, expense_record_view, upcomingExpense_view, add_upcoming_payment, edit_upcoming_payment, delete_upcoming_payment, faq_view, home_view
 
 app_name = "finance"
 urlpatterns = [
@@ -9,11 +9,14 @@ urlpatterns = [
     path("settings/", settings_view, name="settings"),
     path('faq/', faq_view, name='faq'),
     path('expense-record/', expense_record_view, name='expense_record'),
+    path('edit-expense/<int:expense_id>/', edit_expense, name='edit_expense'),
+    path('delete-expense/<int:expense_id>/',
+         delete_expense, name='delete_expense'),
     path("upcomingExpense/", upcomingExpense_view, name="upcoming_expense"),
     path("add-payment/", add_upcoming_payment, name="add_payment"),
     path("edit-payment/<int:payment_id>/",
          edit_upcoming_payment, name="edit_payment"),
     path("delete-payment/<int:payment_id>/",
          delete_upcoming_payment, name="delete_payment"),
-    path('home/', home_view, name='home'),  # mock homepage
+    path('home/', home_view, name='home'),
 ]

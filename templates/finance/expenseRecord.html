@@ -52,7 +52,8 @@
                         <td>{{ expense.amount }}</td>
                         <td>{{ expense.description }}</td>
                         <td>
-                            <button class="edit-btn">EDIT</button>
+                            <a href="{% url 'finance:edit_expense' expense.id %}" class="edit-btn">EDIT</a>
+                            <a href="{% url 'finance:delete_expense' expense.id %}" class="delete-btn">DELETE</a>
                         </td>
                     </tr>
                     {% endfor %}
