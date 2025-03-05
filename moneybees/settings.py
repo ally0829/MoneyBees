@@ -10,13 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 import os
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR  / 'finance' / 'data'
+DATA_DIR = BASE_DIR / 'finance' / 'data'
 
 
 # Quick-start development settings - unsuitable for production
@@ -135,24 +136,27 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-#STATIC_URL = "static/"
+# STATIC_URL = "static/"
 
-#STATICFILES_DIRS = [
+# STATICFILES_DIRS = [
 #    os.path.join(BASE_DIR, "static"),
-#]
+# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Option: use SendGrid
+# for testing(print on console)
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your-email@gmail.com'  # need to be changed
-EMAIL_HOST_PASSWORD = 'your-email-password'  # need to be changed
-DEFAULT_FROM_EMAIL = 'noreply@yourdomain.com'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = f"MoneyBees <{os.environ.get('EMAIL_HOST_USER')}>"
+
 
 AUTH_USER_MODEL = 'users.User'

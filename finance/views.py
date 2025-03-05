@@ -8,6 +8,8 @@ from datetime import datetime
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail, EmailMessage
+from django.http import HttpResponse
 
 # Create your views here.
 
@@ -237,3 +239,19 @@ def delete_upcoming_payment(request, payment_id):
         return JsonResponse({"message": "Payment deleted"})
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
+
+
+def test_email(request):
+    user_email = request.user.email if request.user.is_authenticated else "test@example.com"
+
+    try:
+        send_mail(
+            subject="Test Email from MoneyBees",
+            message="This is a test email from your MoneyBees application.",
+            from_email="MoneyBees <alice850829@gmail.com>",
+            recipient_list=[user_email],
+            fail_silently=False,
+        )
+        return HttpResponse("Test email has been sent to your email address!")
+    except Exception as e:
+        return HttpResponse(f"Error sending email: {str(e)}")
