@@ -6,16 +6,16 @@ User = get_user_model()
 
 
 class SignUpForm(UserCreationForm):
-    first_name = forms.CharField(widget=forms.TextInput(
+    firstname = forms.CharField(widget=forms.TextInput(
         attrs={'class': 'form-control'}))
-    last_name = forms.CharField(widget=forms.TextInput(
+    lastname = forms.CharField(widget=forms.TextInput(
         attrs={'class': 'form-control'}))
     email = forms.EmailField(widget=forms.EmailInput(
         attrs={'class': 'form-control'}))
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'password1', 'password2']
+        fields = ['firstname', 'lastname', 'email', 'password1', 'password2']
 
     def __init__(self, *args, **kwargs):
         super(SignUpForm, self).__init__(*args, **kwargs)
@@ -28,6 +28,14 @@ class SignUpForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+    def clean_email(self):
+        """ensure unique Email"""
+        email = self.cleaned_data.get("email")
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError(
+                "This E-mail already exists, please use another E-mail.")
+        return email
 
 
 class LoginForm(AuthenticationForm):
