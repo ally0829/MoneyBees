@@ -1,33 +1,77 @@
-{% extends "finance/sidebar.html" %}
+{% extends "finance/sidebar.html" %} 
+{% load static %}
 
 {% block style %}
-<!-- Load static files -->
-{% load static %}
-<link rel="stylesheet" href="{% static 'css/income_expense_input.css' %}">
+  <!-- Load static files -->
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
 
-{{ block.super }}
 {% endblock %}
 
 {% block main %}
-<div class="form_container">
-    <div class="add_income_expense">
-        {% if type == "income" %}
-        <h2>Add Income</h2>
-        <form method="post" action="{% url 'finance:add_income' %}">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Add Income</button>
-        </form>
-        {% else %}
-        <h2>Add Expense</h2>
-        <form method="post" action="{% url 'finance:add_expense' %}">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Add Expense</button>
-        </form>
-        {% endif %}
-
-    </div>
+<div class="home">
+    <section class="spending">
+        <div class="actionbtn-container">
+            <h2>Spending</h2>
+            <button class="btn btn-shadow btn-shadow--black"> <span>View more</span> </button>
+        </div>
+        <div>Date DD/MM/YY<div>
+        {% comment %} <div class="chart1-container"> {% endcomment %}
+            <canvas id="spendingChart"></canvas>  <!-- Chart goes here -->
+        {% comment %} </div> {% endcomment %}
+        
+        
+        
+        <!-- Add your chart here -->
+    </section>
+    <section class="upcoming-payments">
+        <h3>Upcoming Payments</h3>
+        <ul>
+            <li>Youtube Premium - $23.80</li>
+            <li>Preschool - $280.00</li>
+            <li>Rent - $1100.00</li>
+            <li>Spotify - $11.89</li>
+        </ul>
+    </section>
+    <section class="expense-target">
+        <h3>Monthly Expense Target</h3>
+        <p>Food: $1,724 / $5,000</p>
+        <p>Transport: $1,724 / $5,000</p>
+        <p>Entertainment: $1,724 / $5,000</p>
+    </section>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById('spendingChart').getContext('2d');
+    
+        new Chart(ctx, {
+            type: 'doughnut',  // Creates a circular chart
+            data: {
+                labels: ['Food', 'Shopping', 'Media', 'Transport'],
+                datasets: [{
+                    data: [42, 36, 15, 5],  // Percentages
+                    backgroundColor: ['#FFA500', '#FF4500', '#8A2BE2', '#1E90FF'],  // Colors
+                    borderWidth: 1
+                    
+                }]
+                
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,  // Allow custom size
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+                
+            },
+
+            
+        });
+    });
+    
+</script>
 
 {% endblock %}

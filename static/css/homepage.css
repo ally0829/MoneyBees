@@ -1,0 +1,110 @@
+.home{
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* Left panel bigger */
+    grid-template-rows: minmax(400px, 480px) minmax(200px, 280px); /* Two flexible rows */
+    gap: 40px;
+    width: 80%;
+    margin-left: 8%;
+}
+
+
+.spending {
+    background: black;
+    color: white;
+    padding: 60px;
+    border-radius: 10px;
+    grid-column: 1;
+    grid-row: 1 / span 2; /* Spans both rows */
+}
+
+.upcoming-payments {
+    background: black;
+    color: white;
+    padding: 60px;
+    border-radius: 10px;
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.expense-target {
+    background: black;
+    color: white;
+    padding: 60px;
+    border-radius: 10px;
+    grid-column: 2;
+    grid-row: 2;
+}
+
+
+/* buttons */
+.actionbtn-container{
+    display: flex;
+    place-content: space-between;
+}
+
+.btn {
+    font-family: Arial, Helvetica, sans-serif;
+    /* text-transform: uppercase; */
+  } 
+   
+  .btn:hover .btn-slide-show-text1 {
+    margin-left: 65px;
+  } 
+   
+  .btn-shadow {
+    display: inline-block;
+    /* font-weight: 500;
+    line-height: 24px; */
+    color: rgb(255, 255, 255);
+    position: relative;
+    text-align: center;
+    background: none;
+    outline: none;
+    border: none;
+  } 
+
+  
+   
+  .btn-shadow::before {
+    content: "";
+    height: 40px;
+    position: absolute;
+    bottom: -1px;
+    left: 10px;
+    right: 10px;
+    z-index: 0;
+    border-radius: 2em;
+    filter: blur(14px) brightness(0.9);
+  } 
+   
+  .btn-shadow span {
+    /* display: inline-block; */
+    transform-style: preserve-3d;
+    transition: 0.3s ease-out;
+    padding: 16px 30px;
+    border-radius: 50em;
+    position: relative;
+    z-index: 2;
+    will-change: transform, filter;
+  } 
+   
+  .btn-shadow:hover {
+    color: rgb(255, 255, 255);
+  } 
+   
+  .btn-shadow:hover span {
+    filter: brightness(0.9) contrast(1.2);
+    transform: scale(0.96);
+  } 
+   
+  .btn-shadow:hover::before {
+    bottom: 8px;
+    filter: blur(6px) brightness(0.8);
+    left: 15px;
+    right: 15px;
+  } 
+   
+  .btn-shadow--black span {
+    background: rgb(51, 51, 51);
+  } 
+

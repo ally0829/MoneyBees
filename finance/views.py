@@ -10,6 +10,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+def home_view(request):
+    return render(request, 'finance/homepage.html',{"show_topbar": True})
 
 
 def profile_view(request):
