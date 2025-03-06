@@ -49,7 +49,7 @@
                     <tr>
                         <td>{{ expense.category }}</td>
                         <td>{{ expense.date }}</td>
-                        <td>{{ expense.amount }}</td>
+                        <td>{{user.currency.currency}} {{ expense.amount }}</td>
                         <td>{{ expense.description }}</td>
                         <td>
                             <a href="{% url 'finance:edit_expense' expense.id %}" class="edit-btn">EDIT</a>
@@ -61,7 +61,7 @@
                 <tfoot>
                     <tr>
                         <td colspan="2"><strong>Total Amount:</strong></td>
-                        <td><strong>${{ total_amount }}</strong></td>
+                        <td><strong>{{user.currency.currency}} {{ total_amount }}</strong></td>
                         <td></td>
                         <td></td>
                     </tr>

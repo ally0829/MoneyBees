@@ -28,5 +28,6 @@ urlpatterns = [
     path('expense-targets/', expense_targets, name='expense-targets'),
     path("categories/", categories, name="categories"),
     path("get-current-user/", get_current_user, name="get-current-user"),
+    path("expense-targets/<int:target_id>/", update_expense_target, name="update-expense-target"),
     path("toggle-notifications/", toggle_notifications, name="toggle_notifications"),
 ]

@@ -55,6 +55,7 @@
 {% comment %} Dialog Box {% endcomment %}
 <dialog id="notifDialog">
   <h2>Enable Notification?</h2>
+  <h5>By enabling the notification you will receive an email notification when payment is due in 3 days</h5>
   <label class="switch">
     <input type="checkbox" id="notifToggle" {% if notifications_enabled %}checked{% endif %}>
     <span class="slider round"></span>
@@ -82,7 +83,7 @@
   document.getElementById("notifToggle").addEventListener("change", function() {
     const isEnabled = this.checked;
 
-    fetch("{% url 'toggle_notifications' %}", {
+    fetch("{% url 'finance:toggle_notifications' %}", {
       method: "POST",
       headers: {
         "X-CSRFToken": "{{ csrf_token }}",

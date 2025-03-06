@@ -102,59 +102,103 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error fetching expense targets:", error));
 
 
-    document.getElementById("editExpenseTargetModal").addEventListener("show.bs.modal", function () {
-        fetch("/api/categories/")
-            .then(response => response.json())
-            .then(data => {
-                const categorySelect = document.getElementById("categorySelect");
-                categorySelect.innerHTML = data.categories.map(category => `<option value="${category.id}">${category.name}</option>`).join('');
+        document.getElementById("editExpenseTargetModal").addEventListener("show.bs.modal", function () {
+            fetch("/api/categories/")
+                .then(response => response.json())
+                .then(data => {
+                    const categorySelect = document.getElementById("categorySelect");
+                    categorySelect.innerHTML = data.categories.map(category =>
+                        `<option value="${category.id}">${category.name}</option>`
+                    ).join('');
+                })
+                .catch(error => console.error("Error loading categories:", error));
+    
+            fetch("/api/get-current-user/")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("userSelect").innerHTML = `
+                        <option value="${data.user_id}" selected>${data.username}</option>
+                    `;
+                })
+                .catch(error => console.error("Error loading user:", error));
+    
+            const today = new Date();
+            const currentMonth = today.toISOString().slice(0, 7);
+            const monthInput = document.getElementById("monthInput");
+            monthInput.value = currentMonth;
+            monthInput.setAttribute("readonly", true);
+    
+            document.getElementById("categorySelect").addEventListener("change", function () {
+                const selectedCategory = this.value;
+                if (!selectedCategory) return;
+    
+                fetch(`/api/expense-targets/?category_id=${selectedCategory}`)
+                    .then(response => response.json())
+                    .then(targetData => {
+                        if (targetData.target_amount !== undefined) {
+                            document.getElementById("amountInput").value = targetData.target_amount;
+                            document.getElementById("amountInput").setAttribute("data-target-id", targetData.id); 
+                        } else {
+                            document.getElementById("amountInput").value = "";
+                            document.getElementById("amountInput").removeAttribute("data-target-id"); 
+                        }
+                    })
+                    .catch(error => console.error("Error loading target amount:", error));
+            });
+        });
+    
+        document.getElementById("saveExpenseTarget").addEventListener("click", function () {
+            const user = document.getElementById("userSelect").value;
+            const category = document.getElementById("categorySelect").value;
+            const amount = document.getElementById("amountInput").value;
+            const month = document.getElementById("monthInput").value;
+            const targetId = document.getElementById("amountInput").getAttribute("data-target-id"); 
+            if (!user || !category || !amount || !month) {
+                alert("Please fill in all fields.");
+                return;
+            }
+    
+            const requestData = {
+                user: user,
+                category: category,
+                amount: amount,
+                month: month
+            };
+    
+            let url = "/finance/expense-targets/";
+            let method = "POST";
+
+            if (targetId) {
+                url = `/finance/expense-targets/${targetId}/`;
+                method = "PUT";
+            }
+    
+            fetch(url, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken()
+                },
+                body: JSON.stringify(requestData)
             })
-            .catch(error => console.error("Error loading categories:", error));
-
-        fetch("/api/get-current-user/")
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("userSelect").innerHTML = `<option value="${data.user_id}" selected>${data.username}</option>`;
-            })
-            .catch(error => console.error("Error loading user:", error));
-
-        document.getElementById("monthInput").value = new Date().toISOString().slice(0, 7);
-    });
-
-
-    document.getElementById("saveExpenseTarget").addEventListener("click", function () {
-        const user = document.getElementById("userSelect").value;
-        const category = document.getElementById("categorySelect").value;
-        const amount = document.getElementById("amountInput").value;
-        const month = document.getElementById("monthInput").value;
-
-        if (!user || !category || !amount || !month) {
-            alert("Please fill in all fields.");
-            return;
-        }
-
-        fetch("/api/expense-targets/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": getCSRFToken()
-            },
-            body: JSON.stringify({ user, category, amount, month })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
+                .then(response => response.json())
+                .then(data => {
+                    console.log("API Response:", data);
+                    if (data.error) {
+                        alert("Failed to save expense target."+ data.error);
+                    } else {
+                        alert("Expense target saved successfully!");
+                        location.reload();
+                    }
+                })
+                .catch(error =>{
+                    console.error("Fetch Error:", error);
                     alert("Failed to save expense target.");
-                } else {
-                    alert("Expense target saved successfully!");
-                    location.reload();
-                }
-            })
-            .catch(error => alert("Failed to save expense target."));
+                 
+        });
+    
+        function getCSRFToken() {
+            return document.cookie.split("; ").find(row => row.startsWith("csrftoken"))?.split("=")[1];
+        }
+        });
     });
-
-
-    function getCSRFToken() {
-        return document.cookie.split("; ").find(row => row.startsWith("csrftoken"))?.split("=")[1];
-    }
-});
