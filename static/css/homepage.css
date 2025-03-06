@@ -1,110 +1,249 @@
-.home{
-    display: grid;
-    grid-template-columns: 2fr 1fr; /* Left panel bigger */
-    grid-template-rows: minmax(400px, 480px) minmax(200px, 280px); /* Two flexible rows */
-    gap: 40px;
-    width: 80%;
-    margin-left: 8%;
+.home {
+  display: grid;
+  grid-template-columns: 2fr 1fr; 
+  grid-template-rows: minmax(280px, 340px) minmax(200px, 280px);
+  gap: 40px;
+  width: 80%;
+  margin-left: 8%;
 }
 
-
 .spending {
-    background: black;
-    color: white;
-    padding: 60px;
-    border-radius: 10px;
-    grid-column: 1;
-    grid-row: 1 / span 2; /* Spans both rows */
+  background: black;
+  color: white;
+  padding: 40px;
+  border-radius: 10px;
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .upcoming-payments {
-    background: black;
-    color: white;
-    padding: 60px;
-    border-radius: 10px;
-    grid-column: 2;
-    grid-row: 1;
+  background: black;
+  color: white;
+  padding: 30px;
+  border-radius: 10px;
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  font-size: 14px;
+}
+
+.payment-list {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.payment-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  margin: 5px 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
 }
 
 .expense-target {
-    background: black;
-    color: white;
-    padding: 60px;
-    border-radius: 10px;
-    grid-column: 2;
+  background: black;
+  color: white;
+  padding: 30px;
+  border-radius: 10px;
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  font-size: 14px;
+  min-height: 280px;
+  max-height: 320px;
+  overflow: hidden;
+}
+
+.target-list {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  border-radius: 10px;
+  width: 100%;
+  max-height: 180px; 
+  overflow-y: auto; 
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1);
+}
+
+.target-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.target-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.target-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+.target-list:not(:hover)::-webkit-scrollbar {
+  width: 0;
+}
+
+.chart-info-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 40px;
+  margin-top: 20px;
+}
+
+.chart-container {
+  flex: 0 0 auto;
+  max-width: 320px;
+  position: relative;
+}
+
+.chart-center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+}
+
+.category-info {
+  flex: 1;
+  text-align: left;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.color-box {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.target-item {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 8px;
+  width: 100%;
+}
+
+.target-category {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: white;
+}
+
+.target-progress-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(60, 60, 60, 0.7);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  margin: 0 0 8px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #8A2BE2;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.target-amount {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  color: #f0f0f0;
+  font-size: 14px;
+}
+
+.btn-shadow {
+  display: inline-block;
+  color: rgb(255, 255, 255);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1); 
+  outline: none;
+  border: none;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  min-width: 60px;
+  height: 30px;
+}
+
+.btn-shadow--black span {
+  background: rgb(110, 110, 110);
+}
+
+@media screen and (max-width: 768px) {
+  .home {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    width: 95%;
+    margin: 0 auto;
+    gap: 20px;
+  }
+
+  .spending {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .upcoming-payments {
+    grid-column: 1;
     grid-row: 2;
+  }
+
+  .expense-target {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .chart-info-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .category-info {
+    min-width: 100%;
+  }
 }
-
-
-/* buttons */
-.actionbtn-container{
-    display: flex;
-    place-content: space-between;
-}
-
-.btn {
-    font-family: Arial, Helvetica, sans-serif;
-    /* text-transform: uppercase; */
-  } 
-   
-  .btn:hover .btn-slide-show-text1 {
-    margin-left: 65px;
-  } 
-   
-  .btn-shadow {
-    display: inline-block;
-    /* font-weight: 500;
-    line-height: 24px; */
-    color: rgb(255, 255, 255);
-    position: relative;
-    text-align: center;
-    background: none;
-    outline: none;
-    border: none;
-  } 
-
-  
-   
-  .btn-shadow::before {
-    content: "";
-    height: 40px;
-    position: absolute;
-    bottom: -1px;
-    left: 10px;
-    right: 10px;
-    z-index: 0;
-    border-radius: 2em;
-    filter: blur(14px) brightness(0.9);
-  } 
-   
-  .btn-shadow span {
-    /* display: inline-block; */
-    transform-style: preserve-3d;
-    transition: 0.3s ease-out;
-    padding: 16px 30px;
-    border-radius: 50em;
-    position: relative;
-    z-index: 2;
-    will-change: transform, filter;
-  } 
-   
-  .btn-shadow:hover {
-    color: rgb(255, 255, 255);
-  } 
-   
-  .btn-shadow:hover span {
-    filter: brightness(0.9) contrast(1.2);
-    transform: scale(0.96);
-  } 
-   
-  .btn-shadow:hover::before {
-    bottom: 8px;
-    filter: blur(6px) brightness(0.8);
-    left: 15px;
-    right: 15px;
-  } 
-   
-  .btn-shadow--black span {
-    background: rgb(51, 51, 51);
-  } 
-

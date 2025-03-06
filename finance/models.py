@@ -68,7 +68,7 @@ class MonthlyExpenseTarget(models.Model):
         verbose_name_plural = "monthly_expense_target"
 
     def __str__(self):
-        return f"{self.user.firstname} - {self.target_amount} for {self.category.name}"
+        return f"{self.user.firstname} - {self.amount} for {self.category.name}"
 
 
 class UpcomingPayment(models.Model):
@@ -80,3 +80,5 @@ class UpcomingPayment(models.Model):
 
     def __str__(self):
         return f"{self.user.firstname} - {self.category.name} - {self.amount} on {self.date}"
+    
+

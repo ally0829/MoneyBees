@@ -10,13 +10,16 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail, EmailMessage
 from django.http import HttpResponse
+from django.utils.timezone import now
+from datetime import timedelta
+import logging
 
+logger = logging.getLogger(__name__)
 # Create your views here.
 
 
 def home_view(request):
     return render(request, 'finance/homepage.html', {"show_topbar": True})
-
 
 def profile_view(request):
     return render(request, 'finance/profile.html', {"show_topbar": False})
@@ -279,3 +282,120 @@ def test_email(request):
         return HttpResponse("Test email has been sent to your email address!")
     except Exception as e:
         return HttpResponse(f"Error sending email: {str(e)}")
+# API: return the percentage of the expense per month in the home page 
+@login_required
+def spending_summary(request):
+
+    user=request.user
+    today=now().date()
+    first_day_of_month=today.replace(day=1)
+
+    expenses=Expense.objects.filter(user=user,date__gte=first_day_of_month)
+    result = expenses.aggregate(total=Sum('amount'))
+    total_spent = result.get('total', 0)  
+
+
+    category_data=expenses.values('category__name').annotate(total=Sum('amount'))
+
+    data=[
+        {
+            "category":category['category__name'],
+            "amount":category['total'],
+            "percentage":round((category['total']/total_spent)*100,2) if total_spent>0 else 0 
+
+        }
+        for category in category_data
+    ]
+
+    return JsonResponse({"total_spent": total_spent,"categories":data})
+
+@login_required
+def upcoming_expenses(request):
+    
+    user=request.user
+    today=now().date()
+
+    upcoming_payments=UpcomingPayment.objects.filter(user=user,date__gte=today).order_by('date')[:3]
+
+    data=[
+        {
+           "category":payment.category.name,
+           "amount":payment.amount,
+           "due_date":payment.date.strftime("%d %b")
+        }
+        for payment in upcoming_payments
+    ]
+
+    return JsonResponse({"upcoming_expenses":data})
+
+@csrf_exempt
+@login_required
+def expense_targets(request):
+    user = request.user
+    today = now().date()
+    first_day_of_month = today.replace(day=1)
+
+    if request.method == "GET":
+        targets = MonthlyExpenseTarget.objects.filter(user=user)
+        expenses = Expense.objects.filter(user=user, date__gte=first_day_of_month).values('category').annotate(total=Sum('amount'))
+
+        expense_dict = {expense['category']: expense['total'] for expense in expenses}
+
+        data = [
+            {
+                "category": target.category.name,
+                "target_amount": float(target.amount), 
+                "current_spent": float(expense_dict.get(target.category.id, 0)),
+                "progress": round((expense_dict.get(target.category.id, 0) / target.amount) * 100, 2) if target.amount > 0 else 0
+            }
+            for target in targets
+        ]
+
+        return JsonResponse({"expense_targets": data})
+
+    elif request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            category_id = data.get("category")
+            amount = data.get("amount")
+            month_str = data.get("month")  
+
+            category = get_object_or_404(ExpenseCategory, id=category_id)
+
+            try:
+                month = int(month_str.split("-")[1]) 
+            except (IndexError, ValueError):
+                return JsonResponse({"error": "Invalid month format. Expected YYYY-MM."}, status=400)
+
+            print(f"try to create MonthlyExpenseTarget: User={user.email}, Category={category.name}, Amount={amount}, Month={month}")
+
+            target = MonthlyExpenseTarget.objects.create(
+                user=user,
+                category=category,
+                amount=amount,
+                month=month 
+            )
+
+            print(f"Success: {target}")
+
+            return JsonResponse({"message": "Success", "id": target.id}, status=201)
+
+        except Exception as e:
+            print(f"Error: {e}")
+            return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+@login_required
+def categories(request):
+    print(f"User {request.user} requested categories") 
+    categories = ExpenseCategory.objects.values("id", "name")
+    return JsonResponse({"categories": list(categories)})
+
+@login_required
+def get_current_user(request):
+    return JsonResponse({
+        "user_id": request.user.id,
+        "username": getattr(request.user, "username", request.user.email) 
+    })
