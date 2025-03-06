@@ -74,3 +74,47 @@ document.getElementById("cancel").onclick = function() {
     document.getElementById("deleteButtonDialog").close();
 }
 
+    // Get references to the form and confirm button
+    const form = document.getElementById('settings-form');
+    const confirmBtn = document.getElementById('confirm-btn');
+
+    // Get the initial values of the form fields
+    const initialValues = {
+        first_name: form.querySelector('[name="first_name"]').value,
+        last_name: form.querySelector('[name="last_name"]').value,
+        email: form.querySelector('[name="email"]').value,
+        password: form.querySelector('[name="password"]').value,
+        currency: form.querySelector('[name="currency"]').value,
+    };
+
+    // Function to check if the form has changed
+    function checkFormChanges() {
+        const currentValues = {
+            first_name: form.querySelector('[name="first_name"]').value,
+            last_name: form.querySelector('[name="last_name"]').value,
+            email: form.querySelector('[name="email"]').value,
+            password: form.querySelector('[name="password"]').value,
+            currency: form.querySelector('[name="currency"]').value,
+        };
+
+        // Compare initial values with current values
+        const hasChanges = Object.keys(initialValues).some(
+            key => initialValues[key] !== currentValues[key]
+        );
+
+        // Show or hide the Confirm button based on changes
+        if (hasChanges) {
+            confirmBtn.style.display = 'block';
+        } else {
+            confirmBtn.style.display = 'none';
+        }
+    }
+
+    // Add event listeners to form fields
+    form.querySelectorAll('input, select').forEach(field => {
+        field.addEventListener('input', checkFormChanges);
+        field.addEventListener('change', checkFormChanges);
+    });
+
+    // Initial check in case the form is pre-filled with changes
+    checkFormChanges();

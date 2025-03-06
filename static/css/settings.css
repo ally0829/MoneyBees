@@ -1,15 +1,23 @@
 .settings {
     display: grid;
-    grid-template-columns: 75%;
-    grid-template-rows: 25% repeat(6, 20%);
+    grid-template-columns: 75% 25%;
+    grid-template-rows: 75% 25%;
+    margin-left: 8%;
+}
+
+#settings-form{
+    grid-row: 1, span 3;
+    /* display: grid; */
+    /* grid-template-columns: 75%; */
+    grid-template-rows: repeat(6, 20%);
     align-items: center; /* Ensures vertical alignment */
     margin-top:4%;
-    margin-left: 8%;
+   
 }
 
 .settings img {
     grid-column: 2; /* Place image in the second column */
-    grid-row: 1 / span 5; /* Make the image span all 5 rows */
+    grid-row: 1 / span 3; /* Make the image span all 5 rows */
     align-self: center; /* Centers the image vertically */
     padding-top: 72px;
 }
@@ -35,7 +43,7 @@
 .settings .gridBox {
     display:flex; 
     align-items: center;
-    margin-bottom: 2%
+    /* margin-bottom: 2% */
 }
 
 .edit-button{
@@ -172,5 +180,16 @@
 }
 
 .confirm-btn{
-    border:10rem;
+    /* border:10rem; */
+    display: flex;
+    justify-self: center;
+    margin-top: 20px;
+}
+
+.confirm-btn button{
+    padding: 20px 108px;
+    margin-left: -60px;
+    font-weight: bold;
+    border-radius: 12px;
+    
 }

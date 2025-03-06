@@ -9,15 +9,13 @@
 
 
 {% block main %}
-<div>
-    {{exchange_rates}}
-    {% comment %} {{exchange_rates_db}} {% endcomment %}
-    {% comment %} {{items}} {% endcomment %}
-    <form method="POST" action={% url 'finance:settings' %} class="settings" id="settings-form">
+<div class="settings">
+    {% comment %} {{exchange_rates}} {% endcomment %}
+    <form method="POST" action={% url 'finance:settings' %}  id="settings-form">
         {% csrf_token %}
         <div class="gridBox">
             <div class="textBox" >
-                <div>FullName</div>
+                <div>First Name</div>
                 <input name="first_name" type="text" value="{{user.firstname}}" class="inputBox" id="inp1" disabled/>
                 {% comment %} <div>DisplayName</div> {% endcomment %}
             </div>
@@ -29,7 +27,7 @@
         </div>
         <div class="gridBox">
             <div class="textBox" >
-                <div>FullName</div>
+                <div>Last Name</div>
                 <input name="last_name" type="text" value="{{user.lastname}}" class="inputBox" id="inp5" disabled/>
                 {% comment %} <div>DisplayName</div> {% endcomment %}
             </div>
@@ -53,7 +51,7 @@
         <div class="gridBox">
             <div class="textBox" >
                 <div>Password</div>
-                <input  name="password"  type="Password" id="inp3" class="inputBox" value="{{user.password}}" disabled>
+                <input  name="password"  type="Password" id="inp3" class="inputBox" value="" disabled>
             </div>
             <button class="edit-button" id="inpb3" type="button"> 
                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
@@ -78,12 +76,12 @@
                 </select>
             </div>
         </div>
-        <div class="confirm-btn">
-            <button type="submit" class=" confirm-btn">Confirm</button>
+        <div class="confirm-btn" id="confirm-btn" style="display: none;">
+            <button type="submit" class=" confirm-btn">Confirm Changes</button>
         </div>
     </form>
 
-    <div style="margin-left: 64px;    margin-top: 100px;">
+    <div style="margin-left: 64px;    margin-top: 80px;">
         <h4 style="text-decoration: underline;font-weight: bold">Manage Your Account</h4> 
         <button class="delete-button" id="dlb"> <span>"Delete Account</span> </button>
     </div>
