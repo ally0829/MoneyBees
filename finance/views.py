@@ -2,21 +2,68 @@ from django.shortcuts import redirect, render, get_object_or_404
 import json
 from django.conf import settings
 from finance.forms import IncomeForm, ExpenseForm
-from finance.models import Income, Expense, ExpenseCategory, MonthlyExpenseTarget, IncomeCategory, User, UpcomingPayment
+from finance.models import Income, Expense, ExpenseCategory, MonthlyExpenseTarget, IncomeCategory, UpcomingPayment
 from django.db.models import Sum
 from datetime import datetime
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail, EmailMessage
+from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.utils.timezone import now
-from datetime import timedelta
 import logging
-
+from django.shortcuts import render, redirect
+# from users.models import Currency
 logger = logging.getLogger(__name__)
 # Create your views here.
 
+
+# views.py
+import requests
+from django.http import JsonResponse
+from django.conf import settings
+
+def get_exchange_rate(request):
+    # Your API key (store it in settings.py for security)
+    api_key = settings.EXCHANGE_RATE_API_KEY
+    url = f"http://api.exchangeratesapi.io/v1/latest?access_key={api_key}"
+
+    # Make the API request
+        # Make the API request
+    response = requests.get(url)
+        #convert json to object
+    response = response.json()
+    print(response)
+    items=response["Items"]
+    print(items)
+    
+    json_itmes = []
+
+    for item in items:
+        currency = item["Item"]
+        json_itmes.append({
+            "success": currency["success"],
+            "timestamp": currency["timestamp"],
+            "base": currency["base"],
+            "date": currency["date"],
+            "rates": currency["rates"]
+        })
+    
+    json_items = json.dump(json_items)
+
+    return JsonResponse({"items": json_items}, status=200)
+
+
+
+# finance/views.py
+from django.shortcuts import render
+from .models import ExchangeRate
+from .utils import fetch_exchange_rates
+
+def currency_converter(request):
+    usd_to_eur = ExchangeRate.objects.get(base_currency='USD', target_currency='EUR').rate
+    context = {'usd_to_eur': usd_to_eur}
+    return render(request, 'converter.html', context)
 
 def home_view(request):
     return render(request, 'finance/homepage.html', {"show_topbar": True})
@@ -25,19 +72,152 @@ def profile_view(request):
     return render(request, 'finance/profile.html', {"show_topbar": False})
 
 
+# def settings_view(request):
+#     api_key = settings.EXCHANGE_RATE_API_KEY
+#     url = f"http://api.exchangeratesapi.io/v1/latest?access_key={api_key}"
+
+#     exchange_rates = ExchangeRate.objects.all()
+
+#     context = {
+#         'exchange_rates': exchange_rates,
+#     }
+
+#     # Make the API request
+#     response = requests.get(url)
+#         #convert json to object
+#     response = response.json()
+#     print(response)
+#     # items=response[0]
+#     # print(items)
+    
+#     json_items = []
+
+#     for item in response:
+#         currency =  item
+#         json_items.append({
+#             "success": currency["success"],
+#             "timestamp": currency["timestamp"],
+#             "base": currency["base"],
+#             "date": currency["date"],
+#             "rates": currency["rates"]
+#         })
+#     #serialize item to json
+#     # json_items = json.dump(json_items)
+
+#     # Check if the request was successful
+#     if response.status_code == 200:
+#         currencies = response.json()
+
+#     # if request.method == 'POST':
+#     #     # Handle form submission
+#     #     user = request.user
+#     #     full_name = request.POST.get('full_name', '')  # Get full name from form
+
+#     #     # Split full name into first and last name
+#     #     name_parts = full_name.strip().split(maxsplit=1)  # Split into two parts
+#     #     first_name = name_parts[0] if len(name_parts) > 0 else ''
+#     #     last_name = name_parts[1] if len(name_parts) > 1 else ''
+#     #     email = request.POST.get('email')
+#     #     password = request.POST.get('password')
+#     #     currency_code = request.POST.get('currency')
+
+#     #     # Update user information
+#     #     if first_name:
+#     #         user.first_name = first_name
+#     #     if last_name:
+#     #         user.last_name = last_name 
+#     #     if email:
+#     #         user.email = email
+#     #     if password:
+#     #         user.set_password(password)  # Set password securely
+
+#     #     # Update currency
+#     #     try:
+#     #         selected_currency = Currency.objects.get(code=currency_code)
+#     #         user.currency = selected_currency
+#     #     except Currency.DoesNotExist:
+#     #         pass  # If currency doesn't exist, we don't change it
+
+#     #     user.save()
+#     #     return redirect('finance:settings')  # Redirect to the same settings page after saving
+#     # # Get the absolute path of the JSON file
+
+#     # # Get the current user's currency
+#     # current_currency = request.user.currency if request.user.currency else None
+
+    
+
+#     return render(request, 'finance/settings.html', {
+#         'currencies': currencies,
+#         # 'current_currency': current_currency,
+#         'items': json_items,
+#     })
 def settings_view(request):
-    # Get the absolute path of the JSON file
-    json_path = settings.DATA_DIR / 'currencies.json'
+    api_key = settings.EXCHANGE_RATE_API_KEY
+    url = f"http://api.exchangeratesapi.io/v1/latest?access_key=db182e54f6c67865d0a9db5ebe11036b"
 
-    # Load the JSON data
-    with open(json_path, 'r', encoding='utf-8') as f:
-        currencies = json.load(f)
+    # Make the API request
+    response = requests.get(url)
+    data = response.json()  # Convert JSON response to Python dictionary
+    print(data)  # Debugging: Print the response data
 
-    return render(request, 'finance/settings.html', {'currencies': currencies})
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Extract relevant data
+        exchange_rates = {
+            "success": data.get("success"),
+            "timestamp": data.get("timestamp"),
+            "base": data.get("base"),
+            "date": data.get("date"),
+            "rates": data.get("rates"),
+        }
+    else:
+        exchange_rates = {}  # Fallback in case of API failure
+
+    # Fetch existing exchange rates from the database (if needed)
+    exchange_rates_db = ExchangeRate.objects.all()
+
+    # Prepare the context
+    context = {
+        'exchange_rates': exchange_rates,
+        'exchange_rates_db': exchange_rates_db,
+        'items': exchange_rates,  # Pass the exchange_rates data as 'items'
+    }
+
+    return render(request, 'finance/settings.html', context)
+
+# def settings_view(request):
+#     user = request.user  # Get the logged-in user
+
+#     if request.method == 'POST':
+#         user_form = SettingsForm(request.POST, instance=user)  # Bind form to existing user
+#         if user_form.is_valid():
+#             user_form.save()  # Saves the user details
+
+#             messages.success(request, "Settings updated successfully!")
+#             return redirect('finance:settings')  # Redirect to prevent re-submission
+
+#     else:
+#         user_form = SettingsForm(instance=user)  # Pre-fill form with existing user details
+
+#     # Load the available currencies from a JSON file
+#     json_path = settings.DATA_DIR / 'currencies.json'
+#     with open(json_path, 'r', encoding='utf-8') as f:
+#         currencies = json.load(f)
+
+#     # Get the current user's currency
+#     current_currency = user.currency if user.currency else None
+
+#     return render(request, 'finance/settings.html', {
+#         'form': user_form,  # Pass the form to the template
+#         'currencies': currencies,
+#         'current_currency': current_currency
+#     })
 
 
 def faq_view(request):
     return render(request, 'finance/faq.html')
+
 
 
 def add_income(request):

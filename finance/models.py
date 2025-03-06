@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from users.models import User
+from djmoney.models.fields import MoneyField
 
 
 class ExpenseCategory(models.Model):
@@ -82,3 +83,14 @@ class UpcomingPayment(models.Model):
         return f"{self.user.firstname} - {self.category.name} - {self.amount} on {self.date}"
     
 
+# users/models.py
+
+class ExchangeRate(models.Model):
+    success = models.BooleanField() #true false
+    timestamp = models.BigIntegerField() # 1741259771
+    base = models.CharField(max_length=3) # EUR
+    date = models.DateField() #"2025-03-06"
+    rates = models.JSONField()  # {AED: 3.231323 , AFN, 77.2323 etc...}
+
+    def __str__(self):
+        return f"Exchange rates for {self.base} on {self.date}"

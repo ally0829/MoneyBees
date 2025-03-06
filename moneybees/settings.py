@@ -19,12 +19,12 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / 'finance' / 'data'
 
-
+SECRET_KEY = "django-insecure-2z=$73p3gi!_!6z#)$bq)*8k%(i2(#^+%ghx)vj@lgt!&a5+b%"
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-2z=$73p3gi!_!6z#)$bq)*8k%(i2(#^+%ghx)vj@lgt!&a5+b%"
+EXCHANGE_RATE_API_KEY = "db182e54f6c67865d0a9db5ebe11036b"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # 'currencies',
 
 
     # google login functionality needs to be checked
@@ -89,7 +90,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "moneybees.wsgi.application"
 
-
+EXCHANGE_RATE_API_KEY = "db182e54f6c67865d0a9db5ebe11036b"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -137,8 +138,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-# STATIC_URL = "static/"
-
+#STATIC_URL = "static/"
+# settings.py
+# AUTO_CONVERT_MONEY = True
+# DEFAULT_CURRENCY = "USD"
 # STATICFILES_DIRS = [
 #    os.path.join(BASE_DIR, "static"),
 # ]
