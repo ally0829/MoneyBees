@@ -57,6 +57,8 @@ def add_income(request):
                 description=income_form.cleaned_data['description']
             )
             income.save()
+
+            return redirect('finance:add_income')
     else:
         income_form = IncomeForm(initial={'user': request.user})
     return render(request, 'finance/add_expense_income.html', {
@@ -83,6 +85,9 @@ def add_expense(request):
                 description=expense_form.cleaned_data['description']
             )
             expense.save()
+
+            return redirect('finance:add_expense')
+
     else:
         expense_form = ExpenseForm(initial={'user': request.user})
     return render(request, 'finance/add_expense_income.html', {
@@ -288,17 +293,24 @@ def spending_summary(request):
 
     user=request.user
     today=now().date()
-    first_day_of_month=today.replace(day=1)
 
-    expenses=Expense.objects.filter(user=user,date__gte=first_day_of_month)
+    current_year = today.year
+    current_month = today.month
+
+    expenses=Expense.objects.filter(
+        user=user,
+        date__year=current_year,  
+        date__month=current_month  
+    )
     result = expenses.aggregate(total=Sum('amount'))
     total_spent = result.get('total', 0)  
 
 
-    category_data=expenses.values('category__name').annotate(total=Sum('amount'))
+    category_data=expenses.values('category__id','category__name').annotate(total=Sum('amount'))
 
     data=[
         {
+            "category_id": category['category__id'],
             "category":category['category__name'],
             "amount":category['total'],
             "percentage":round((category['total']/total_spent)*100,2) if total_spent>0 else 0 
@@ -306,6 +318,7 @@ def spending_summary(request):
         }
         for category in category_data
     ]
+    print(f"🟢 {current_year}-{current_month} expense data:", data)
 
     return JsonResponse({"total_spent": total_spent,"categories":data})
 
@@ -333,18 +346,40 @@ def upcoming_expenses(request):
 def expense_targets(request):
     user = request.user
     today = now().date()
-    first_day_of_month = today.replace(day=1)
+    current_year = today.year
+    current_month = today.month
 
     if request.method == "GET":
-        targets = MonthlyExpenseTarget.objects.filter(user=user)
-        expenses = Expense.objects.filter(user=user, date__gte=first_day_of_month).values('category').annotate(total=Sum('amount'))
+        category_id = request.GET.get("category_id")
 
+        if category_id:
+            try:
+                category_id = int(category_id)  
+            except ValueError:
+                return JsonResponse({"error": "Invalid category_id"}, status=400)
+
+            target = MonthlyExpenseTarget.objects.filter(
+                user=user, category_id=category_id, month=current_month
+            ).first()
+
+            if target:
+                return JsonResponse({
+                    "id": target.id,
+                    "category": target.category.name,
+                    "target_amount": float(target.amount),
+                    "month": target.month,
+                })
+            else:
+                return JsonResponse({"message": "No target found"}, status=404)
+
+        targets = MonthlyExpenseTarget.objects.filter(user=user, month=current_month)
+        expenses = Expense.objects.filter(user=user, date__year=current_year, date__month=current_month).values('category').annotate(total=Sum('amount'))
         expense_dict = {expense['category']: expense['total'] for expense in expenses}
 
         data = [
             {
                 "category": target.category.name,
-                "target_amount": float(target.amount), 
+                "target_amount": float(target.amount),
                 "current_spent": float(expense_dict.get(target.category.id, 0)),
                 "progress": round((expense_dict.get(target.category.id, 0) / target.amount) * 100, 2) if target.amount > 0 else 0
             }
@@ -356,8 +391,8 @@ def expense_targets(request):
     elif request.method == "POST":
         try:
             data = json.loads(request.body)
-            category_id = data.get("category")
-            amount = data.get("amount")
+            category_id = int (data.get("category"))
+            amount = float(data.get("amount"))
             month_str = data.get("month")  
 
             category = get_object_or_404(ExpenseCategory, id=category_id)
@@ -384,8 +419,35 @@ def expense_targets(request):
             print(f"Error: {e}")
             return JsonResponse({"error": str(e)}, status=400)
 
-    return JsonResponse({"error": "Invalid request"}, status=400)
 
+
+@csrf_exempt
+@login_required
+def update_expense_target(request, target_id):
+    try:
+        print(f"🔍 Debug: Received target_id = {target_id}") 
+
+        target = get_object_or_404(MonthlyExpenseTarget, id=target_id, user=request.user)
+        print(f"Found target: {target}")  
+
+        if request.method == "PUT":
+            data = json.loads(request.body)
+            amount = data.get("amount")
+
+            if not amount:
+                return JsonResponse({"error": "Amount is required"}, status=400)
+
+            target.amount = float(amount)
+            target.save()
+
+            print(f"Successfully updated: {target.amount}")  
+            return JsonResponse({"message": "Updated successfully", "id": target.id}, status=200)
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 @login_required
 def categories(request):
