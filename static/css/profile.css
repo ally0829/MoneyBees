@@ -41,6 +41,8 @@
 
 
 dialog{
+  justify-self: anchor-center;
+  align-self: center;
   padding: 1rem 3rem;
 background: white;
 max-width: 400px;
