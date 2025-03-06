@@ -43,3 +43,8 @@
     text-decoration: none;
     margin-left: 15px;
 }
+
+.nav-link{
+  text-decoration: none;
+  color: black;
+}
