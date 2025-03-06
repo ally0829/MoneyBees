@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "users",
     "finance",
     "django.contrib.admin",
+    # "django.contrib.site",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -157,6 +158,9 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = f"MoneyBees <{os.environ.get('EMAIL_HOST_USER')}>"
+
+# For password reset
+PASSWORD_RESET_TIMEOUT = 86400  # 1 day in seconds
 
 
 AUTH_USER_MODEL = 'users.User'

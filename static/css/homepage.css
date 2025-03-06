@@ -1,28 +1,48 @@
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  height: 100%;
+}
+
 .home {
   display: grid;
-  grid-template-columns: 2fr 1fr; 
-  grid-template-rows: minmax(280px, 340px) minmax(200px, 280px);
-  gap: 40px;
-  width: 80%;
-  margin-left: 8%;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: minmax(250px, 300px) minmax(180px, 250px);
+  gap: 30px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 20px;
+  box-sizing: border-box;
+  height: calc(100vh - 180px);
+  /* Adjust based on your header/navbar height */
+  min-height: 600px;
+  /* Set a minimum height */
 }
 
 .spending {
   background: black;
   color: white;
-  padding: 40px;
+  padding: 25px;
   border-radius: 10px;
   grid-column: 1;
   grid-row: 1 / span 2;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-y: auto;
 }
 
 .upcoming-payments {
   background: black;
   color: white;
-  padding: 30px;
+  padding: 20px;
   border-radius: 10px;
   grid-column: 2;
   grid-row: 1;
@@ -31,6 +51,9 @@
   justify-content: flex-start;
   align-items: flex-start;
   font-size: 14px;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-y: auto;
 }
 
 .payment-list {
@@ -41,21 +64,28 @@
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  box-sizing: border-box;
+  max-height: 150px;
+  /* Adjust as needed */
+  overflow-y: auto;
 }
 
 .payment-item {
   display: flex;
   justify-content: space-between;
-  padding: 10px;
-  margin: 5px 0;
+  padding: 8px;
+  margin: 4px 0;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  word-break: break-word;
 }
 
 .expense-target {
   background: black;
   color: white;
-  padding: 30px;
+  padding: 20px;
   border-radius: 10px;
   grid-column: 2;
   grid-row: 2;
@@ -64,9 +94,9 @@
   justify-content: flex-start;
   align-items: flex-start;
   font-size: 14px;
-  min-height: 280px;
-  max-height: 320px;
   overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .target-list {
@@ -74,30 +104,43 @@
   padding: 10px;
   border-radius: 10px;
   width: 100%;
-  max-height: 180px; 
-  overflow-y: auto; 
+  max-height: 150px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
 }
 
-.target-list::-webkit-scrollbar {
+.target-list::-webkit-scrollbar,
+.payment-list::-webkit-scrollbar,
+.spending::-webkit-scrollbar,
+.upcoming-payments::-webkit-scrollbar {
   width: 6px;
 }
 
-.target-list::-webkit-scrollbar-track {
+.target-list::-webkit-scrollbar-track,
+.payment-list::-webkit-scrollbar-track,
+.spending::-webkit-scrollbar-track,
+.upcoming-payments::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 10px;
 }
 
-.target-list::-webkit-scrollbar-thumb {
+.target-list::-webkit-scrollbar-thumb,
+.payment-list::-webkit-scrollbar-thumb,
+.spending::-webkit-scrollbar-thumb,
+.upcoming-payments::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 10px;
 }
 
-.target-list:not(:hover)::-webkit-scrollbar {
+.target-list:not(:hover)::-webkit-scrollbar,
+.payment-list:not(:hover)::-webkit-scrollbar,
+.spending:not(:hover)::-webkit-scrollbar,
+.upcoming-payments:not(:hover)::-webkit-scrollbar {
   width: 0;
 }
 
@@ -106,14 +149,18 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  gap: 40px;
-  margin-top: 20px;
+  gap: 30px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+  box-sizing: border-box;
 }
 
 .chart-container {
   flex: 0 0 auto;
-  max-width: 320px;
+  max-width: 280px;
   position: relative;
+  width: 100%;
+  height: auto;
 }
 
 .chart-center-text {
@@ -121,7 +168,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 22px;
+  font-size: 20px;
   font-weight: bold;
   color: white;
 }
@@ -129,38 +176,43 @@
 .category-info {
   flex: 1;
   text-align: left;
-  min-width: 250px;
+  min-width: 200px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  box-sizing: border-box;
 }
 
 .category-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .color-box {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  margin-right: 10px;
+  margin-right: 8px;
+  flex-shrink: 0;
 }
 
 .target-item {
   display: flex;
   flex-direction: column;
-  padding: 12px;
+  padding: 10px;
   background: rgba(30, 30, 30, 0.8);
   border-radius: 8px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .target-category {
   font-weight: bold;
-  font-size: 16px;
-  margin-bottom: 8px;
+  font-size: 15px;
+  margin-bottom: 6px;
   color: white;
 }
 
@@ -177,7 +229,7 @@
   border-radius: 3px;
   overflow: hidden;
   position: relative;
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0;
 }
 
 .progress-fill {
@@ -192,58 +244,82 @@
   justify-content: flex-end;
   width: 100%;
   color: #f0f0f0;
-  font-size: 14px;
+  font-size: 13px;
 }
 
-.btn-shadow {
-  display: inline-block;
-  color: rgb(255, 255, 255);
-  text-align: center;
-  background: rgba(255, 255, 255, 0.1); 
-  outline: none;
+/* Modern button style for actions */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
   border: none;
-  padding: 6px 12px;
-  font-size: 12px;
   border-radius: 6px;
-  min-width: 60px;
-  height: 30px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
-.btn-shadow--black span {
-  background: rgb(110, 110, 110);
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-@media screen and (max-width: 768px) {
-  .home {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    width: 95%;
-    margin: 0 auto;
-    gap: 20px;
-  }
+.action-btn:active {
+  transform: translateY(0);
+}
 
-  .spending {
-    grid-column: 1;
-    grid-row: 1;
-  }
+/* Add subtle icon to buttons */
+.action-btn::after {
+  content: "→";
+  margin-left: 5px;
+  font-size: 14px;
+  transition: transform 0.2s ease;
+}
 
-  .upcoming-payments {
-    grid-column: 1;
-    grid-row: 2;
-  }
+.action-btn:hover::after {
+  transform: translateX(2px);
+}
 
-  .expense-target {
-    grid-column: 1;
-    grid-row: 3;
-  }
+/* Edit button variation */
+.action-btn.edit-btn {
+  background: rgba(138, 43, 226, 0.25);
+  /* Using your purple accent color */
+}
 
-  .chart-info-container {
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
-  }
+.action-btn.edit-btn:hover {
+  background: rgba(138, 43, 226, 0.35);
+}
 
-  .category-info {
-    min-width: 100%;
-  }
+.action-btn.edit-btn::after {
+  content: "✎";
+  font-size: 12px;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.actionbtn-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+h2,
+h3 {
+  margin: 0 0 10px 0;
 }
