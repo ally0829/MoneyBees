@@ -90,7 +90,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "moneybees.wsgi.application"
 
-EXCHANGE_RATE_API_KEY = "db182e54f6c67865d0a9db5ebe11036b"
+EXCHANGE_RATE_API_KEY = "2766f9e7423debacfa6ac1c8b83f49a1"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 

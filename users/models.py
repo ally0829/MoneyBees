@@ -31,7 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)
     currency = models.ForeignKey(
-        'Currency', on_delete=models.SET_NULL, null=True)
+        'Currency', on_delete=models.SET_NULL, null=True,  default="EUR" )  # Foreign key to Currency
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -49,8 +49,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Currency(models.Model):
-    id = models.AutoField(primary_key=True)
-    currency = models.CharField(max_length=128)
+    currency = models.CharField(primary_key=True, max_length=3)  # e.g., USD, EUR
 
     class Meta:
         verbose_name_plural = "currency"

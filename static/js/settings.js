@@ -4,6 +4,13 @@ document.getElementById("inpb1").onclick = function (event) {
     event.stopPropagation();
 };
 
+document.getElementById("inpb5").onclick = function (event) {
+    hidePassword(event); // Hide password if another field is clicked
+    toggleInput("inp5");
+    event.stopPropagation();
+};
+
+
 document.getElementById("inpb2").onclick = function (event) {
     hidePassword(event); // Hide password if another field is clicked
     toggleInput("inp2");
@@ -66,3 +73,4 @@ document.getElementById("closeDialog").onclick = function() {
 document.getElementById("cancel").onclick = function() {
     document.getElementById("deleteButtonDialog").close();
 }
+
