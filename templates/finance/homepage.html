@@ -1,10 +1,10 @@
-{% extends "finance/sidebar.html" %} 
+{% extends "finance/sidebar.html" %}
 {% load static %}
 
 {% block style %}
-  <!-- Load static files -->
-  {{ block.super }}
-  <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+<!-- Load static files -->
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/homepage.css' %}">
 
 {% endblock %}
 
@@ -16,13 +16,14 @@
             <button class="btn btn-shadow btn-shadow--black"> <span>View more</span> </button>
         </div>
         <div>Date DD/MM/YY<div>
-        {% comment %} <div class="chart1-container"> {% endcomment %}
-            <canvas id="spendingChart"></canvas>  <!-- Chart goes here -->
-        {% comment %} </div> {% endcomment %}
-        
-        
-        
-        <!-- Add your chart here -->
+                {% comment %} <div class="chart1-container"> {% endcomment %}
+                    <canvas id="spendingChart"></canvas> <!-- Chart goes here -->
+                    {% comment %}
+                </div> {% endcomment %}
+
+
+
+                <!-- Add your chart here -->
     </section>
     <section class="upcoming-payments">
         <h3>Upcoming Payments</h3>
@@ -41,37 +42,8 @@
     </section>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const ctx = document.getElementById('spendingChart').getContext('2d');
-    
-        new Chart(ctx, {
-            type: 'doughnut',  // Creates a circular chart
-            data: {
-                labels: ['Food', 'Shopping', 'Media', 'Transport'],
-                datasets: [{
-                    data: [42, 36, 15, 5],  // Percentages
-                    backgroundColor: ['#FFA500', '#FF4500', '#8A2BE2', '#1E90FF'],  // Colors
-                    borderWidth: 1
-                    
-                }]
-                
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,  // Allow custom size
-                plugins: {
-                    legend: {
-                        position: 'right'
-                    }
-                }
-                
-            },
-
-            
-        });
-    });
-    
-</script>
-
+{% block script %}
+{% load static %}
+<script src="{% static 'js/homepage.js' %}"></script>
+{% endblock %}
 {% endblock %}
