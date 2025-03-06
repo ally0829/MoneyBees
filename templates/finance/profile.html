@@ -55,10 +55,8 @@
 {% comment %} Dialog Box {% endcomment %}
 <dialog id="notifDialog">
   <h2>Enable Notification?</h2>
-  {% comment %} <p>This is a simple dialog box.</p> {% endcomment %}
   <label class="switch">
-    {% comment %} <h3>click to enable notificationButton</h3> {% endcomment %}
-    <input type="checkbox" checked>
+    <input type="checkbox" id="notifToggle" {% if notifications_enabled %}checked{% endif %}>
     <span class="slider round"></span>
   </label></br>
   <button id="closeNotifDialogBtn">Close</button>
@@ -80,5 +78,29 @@
   document.getElementById("FAQ").onclick = function() {
     location.href = "/finance/faq";  
   };
+
+  document.getElementById("notifToggle").addEventListener("change", function() {
+    const isEnabled = this.checked;
+
+    fetch("{% url 'toggle_notifications' %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ enabled: isEnabled }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === "success") {
+        alert("Notification preferences updated successfully.");
+      } else {
+        alert("Failed to update notification preferences.");
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
+  });
 </script>
 {% endblock %} 

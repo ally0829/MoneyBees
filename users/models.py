@@ -32,7 +32,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     password = models.CharField(max_length=128)
     currency = models.ForeignKey(
         'Currency', on_delete=models.SET_NULL, null=True,  default="EUR" )  # Foreign key to Currency
-
+    notification = models.BooleanField( default = False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 

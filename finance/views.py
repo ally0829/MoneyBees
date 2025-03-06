@@ -74,9 +74,24 @@ def home_view(request):
     return render(request, 'finance/homepage.html', {"show_topbar": True})
 
 def profile_view(request):
-    return render(request, 'finance/profile.html', {"show_topbar": False})
+    profile, created = User.objects.get_or_create(user=request.user)
+    return render(request, 'finance/profile.html', {
+        "show_topbar": False,
+        "notifications_enabled": profile.notifications_enabled,
+    })
 
-
+@csrf_exempt
+def toggle_notifications(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            profile = User.objects.get(user=request.user)
+            profile.notifications_enabled = data.get("enabled", False)
+            profile.save()
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
 
 
 
