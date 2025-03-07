@@ -5,6 +5,7 @@ from django.conf import settings
 from datetime import datetime, timedelta
 from finance.models import UpcomingPayment, User
 
+
 class Command(BaseCommand):
     help = 'Send email notifications for upcoming payments'
 
@@ -22,8 +23,8 @@ class Command(BaseCommand):
         for payment in upcoming_payments:
             user = payment.user
             try:
-                profile = User.objects.get(user=user)
-                if profile.notifications_enabled and user.email:
+                profile = User.objects.get(email=user.email)
+                if profile.notification and user.email:
                     subject = f"Upcoming Payment Reminder: {payment.category.name}"
                     message = f"""
                     Hi {user.firstname},

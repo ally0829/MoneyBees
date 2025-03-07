@@ -1,16 +1,20 @@
-.profile{
+.profile {
   display: grid;
   grid-template-columns: 75%;
   grid-template-rows: 25% repeat(4, 20%);
-  align-items: center; /* Ensures vertical alignment */
-  margin-top:2%;
+  align-items: center;
+  /* Ensures vertical alignment */
+  margin-top: 2%;
   margin-left: 8%;
 }
 
 .profile .logo {
-  grid-column: 2; /* Place image in the second column */
-  grid-row: 1 / span 5; /* Make the image span all 5 rows */
-  align-self: center; /* Centers the image vertically */
+  grid-column: 2;
+  /* Place image in the second column */
+  grid-row: 1 / span 5;
+  /* Make the image span all 5 rows */
+  align-self: center;
+  /* Centers the image vertically */
   padding-top: 72px;
 }
 
@@ -24,42 +28,43 @@
   margin: 0px 0px 0px 64px;
 }
 
-.profile-bar div{
+.profile-bar div {
   padding-left: 28px;
 }
 
-.profile-bar svg{
+.profile-bar svg {
   margin-left: 28px;
 }
 
-.black-textBox div{
-  margin-left:40px;    
+.black-textBox div {
+  margin-left: 40px;
   text-decoration: none;
   color: white;
   font-weight: bold;
 }
 
 
-dialog{
+dialog {
   justify-self: anchor-center;
   align-self: center;
   padding: 1rem 3rem;
-background: white;
-max-width: 400px;
-padding-top: 2rem;
-border-radius: 20px;
-border: 0;
-box-shadow: 0 5px 30px 0 rgb(0 0 0 / 10%);
-animation: fadeIn 1s ease both;
-&::backdrop {
+  background: white;
+  max-width: 400px;
+  padding-top: 2rem;
+  border-radius: 20px;
+  border: 0;
+  box-shadow: 0 5px 30px 0 rgb(0 0 0 / 10%);
   animation: fadeIn 1s ease both;
-  /* background: rgb(255 255 255 / 40%); */
-  z-index: 2;
-  /* backdrop-filter: blur(20px); */
+
+  &::backdrop {
+    animation: fadeIn 1s ease both;
+    /* background: rgb(255 255 255 / 40%); */
+    z-index: 2;
+    /* backdrop-filter: blur(20px); */
   }
 }
 
-dialog #closeNotifDialogBtn{
+dialog #closeNotifDialogBtn {
   border: none;
   float: inline-end;
   background-color: white;
@@ -75,7 +80,7 @@ dialog #closeNotifDialogBtn{
   height: 34px;
 }
 
-.switch input { 
+.switch input {
   opacity: 0;
   width: 0;
   height: 0;
@@ -105,15 +110,15 @@ dialog #closeNotifDialogBtn{
   transition: .4s;
 }
 
-input:checked + .slider {
+input:checked+.slider {
   background-color: #2196F3;
 }
 
-input:focus + .slider {
+input:focus+.slider {
   box-shadow: 0 0 1px #2196F3;
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
   -webkit-transform: translateX(26px);
   -ms-transform: translateX(26px);
   transform: translateX(26px);
@@ -127,4 +132,19 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+dialog {
+  width: 800px;
+  max-width: 80%;
+  padding: 30px;
+  border-radius: 10px;
+  border: none;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }

@@ -1,3 +1,9 @@
+from .models import ExchangeRate
+from django.shortcuts import render
+from users.models import Currency
+import requests
+from django.contrib.auth import update_session_auth_hash
+from users.models import User
 from django.shortcuts import redirect, render, get_object_or_404
 import json
 from django.conf import settings
@@ -14,20 +20,11 @@ from django.utils.timezone import now
 import logging
 from django.shortcuts import render, redirect
 from django.contrib import messages
-# from users.models import Currency
 logger = logging.getLogger(__name__)
 # Create your views here.
-from users.models import User
-from django.contrib.auth import update_session_auth_hash
 # views.py
-import requests
-from django.http import JsonResponse
-from django.conf import settings
-from users.models import Currency
-from django.shortcuts import render
-from .models import ExchangeRate
 # Set up logging
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 def fetch_exchange_rates():
@@ -54,18 +51,21 @@ def fetch_exchange_rates():
         logger.error(f"Failed to fetch exchange rates: {e}")
         return {}  # Return an empty dictionary in case of failure
 
+
 @csrf_exempt
 def toggle_notifications(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            profile = User.objects.get(user=request.user)
-            profile.notifications_enabled = data.get("enabled", False)
-            profile.save()
+            user = request.user  # Get the logged-in user
+            # Update the ⁠ notification ⁠ field
+            user.notification = data.get("enabled", False)
+            user.save()  # Save the changes
             return JsonResponse({"status": "success"})
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
     return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
+
 
 def get_exchange_rate(request):
     # Your API key (store it in settings.py for security)
@@ -73,14 +73,14 @@ def get_exchange_rate(request):
     url = f"http://api.exchangeratesapi.io/v1/latest?access_key={api_key}"
 
     # Make the API request
-        # Make the API request
+    # Make the API request
     response = requests.get(url)
-        #convert json to object
+    # convert json to object
     response = response.json()
     print(response)
-    items=response["Items"]
+    items = response["Items"]
     print(items)
-    
+
     json_itmes = []
 
     for item in items:
@@ -92,24 +92,15 @@ def get_exchange_rate(request):
             "date": currency["date"],
             "rates": currency["rates"]
         })
-    
+
     json_items = json.dump(json_items)
 
     return JsonResponse({"items": json_items}, status=200)
 
 
-
-# finance/views.py
-
-# from .utils import fetch_exchange_rates
-
-def currency_converter(request):
-    usd_to_eur = ExchangeRate.objects.get(base_currency='USD', target_currency='EUR').rate
-    context = {'usd_to_eur': usd_to_eur}
-    return render(request, 'converter.html', context)
-
 def home_view(request):
     return render(request, 'finance/homepage.html', {"show_topbar": True})
+
 
 def profile_view(request):
     # Get the current user
@@ -118,21 +109,6 @@ def profile_view(request):
         "show_topbar": False,
         "notifications_enabled": user.notification,  # Pass the `notification` field
     })
-
-@csrf_exempt
-def toggle_notifications(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            user = request.user  # Get the logged-in user
-            user.notification = data.get("enabled", False)  # Update the `notification` field
-            user.save()  # Save the changes
-            return JsonResponse({"status": "success"})
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
-    return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
-
-
 
 
 def settings_view(request):
@@ -169,19 +145,24 @@ def settings_view(request):
         if selected_currency:
             try:
                 # Get or create the Currency object
-                currency, created = Currency.objects.get_or_create(currency=selected_currency)
+                currency, created = Currency.objects.get_or_create(
+                    currency=selected_currency)
                 # Update the rate and timestamp if the currency exists in the API response
                 if exchange_rates.get("rates") and selected_currency in exchange_rates["rates"]:
                     currency.rate = exchange_rates["rates"][selected_currency]
-                    currency.timestamp = exchange_rates.get("timestamp")  # Corrected timestamp assignment
+                    currency.timestamp = exchange_rates.get(
+                        "timestamp")  # Corrected timestamp assignment
                     currency.save()
                 user.currency = currency  # Assign the Currency object
             except Exception as e:
                 logger.error(f"Error updating currency: {e}")
-                messages.error(request, f"Invalid currency: {selected_currency}")
+                messages.error(
+                    request, f"Invalid currency: {selected_currency}")
 
         user.save()
-        print(f"User {user.email} currency set to: {user.currency.currency} with rate: {user.currency.rate}")  # Debugging
+        # Debugging
+        print(
+            f"User {user.email} currency set to: {user.currency.currency} with rate: {user.currency.rate}")
         # Add a success message
         messages.success(request, "Settings updated successfully!")
 
@@ -196,9 +177,9 @@ def settings_view(request):
 
     return render(request, 'finance/settings.html', context)
 
+
 def faq_view(request):
     return render(request, 'finance/faq.html')
-
 
 
 def add_income(request):
@@ -206,14 +187,16 @@ def add_income(request):
     exchange_rates = fetch_exchange_rates()
 
     if request.method == 'POST':
-        income_form = IncomeForm(request.POST, initial={'user': request.user}, exchange_rates=exchange_rates)
+        income_form = IncomeForm(request.POST, initial={
+                                 'user': request.user}, exchange_rates=exchange_rates)
         if income_form.is_valid():
             income = income_form.save(commit=False)
             income.user = request.user
             income.save()
             return redirect('finance:add_income')
     else:
-        income_form = IncomeForm(initial={'user': request.user}, exchange_rates=exchange_rates)
+        income_form = IncomeForm(
+            initial={'user': request.user}, exchange_rates=exchange_rates)
 
     return render(request, 'finance/add_expense_income.html', {
         "show_topbar": True,
@@ -227,7 +210,8 @@ def add_expense(request):
     exchange_rates = fetch_exchange_rates()
 
     if request.method == 'POST':
-        expense_form = ExpenseForm(request.POST, initial={'user': request.user}, exchange_rates=exchange_rates)
+        expense_form = ExpenseForm(request.POST, initial={
+                                   'user': request.user}, exchange_rates=exchange_rates)
         if expense_form.is_valid():
             # Process the form data here
             print(expense_form.cleaned_data)
@@ -240,20 +224,24 @@ def add_expense(request):
                 category=category,
                 date=expense_form.cleaned_data['date'],
                 description=expense_form.cleaned_data['description'],
-                currency=Currency.objects.get(currency=expense_form.cleaned_data['currency'])  # Save the selected currency
+                # Save the selected currency
+                currency=Currency.objects.get(
+                    currency=expense_form.cleaned_data['currency'])
             )
             expense.save()
 
             return redirect('finance:add_expense')
     else:
         # Remove the trailing comma here
-        expense_form = ExpenseForm(initial={'user': request.user}, exchange_rates=exchange_rates)
+        expense_form = ExpenseForm(
+            initial={'user': request.user}, exchange_rates=exchange_rates)
 
     return render(request, 'finance/add_expense_income.html', {
         "show_topbar": True,
         "form": expense_form,
         "type": "expense"
     })
+
 
 def edit_expense(request, expense_id):
     api_key = settings.EXCHANGE_RATE_API_KEY
@@ -308,7 +296,7 @@ def edit_expense(request, expense_id):
         "is_edit": True,  # Flag to indicate we're editing, not adding
         "expense_id": expense_id,  # Pass the expense ID to the template,
         "currency": exchange_rates
-        })
+    })
 
 
 def delete_expense(request, expense_id):
@@ -352,12 +340,11 @@ def expense_record_view(request):
     elif end_date:
         expenses = expenses.filter(date__lte=end_date) * user.currency.rate
 
-        
-
     if category and category != "ALL":
         expenses = expenses.filter(category__name=category)
 
-    total_amount = expenses.aggregate(Sum('amount'))['amount__sum'] * user.currency.rate or 0
+    total_amount = expenses.aggregate(
+        Sum('amount'))['amount__sum'] * user.currency.rate or 0
 
     return render(request, 'finance/expenseRecord.html', {
         'categories': categories,
@@ -471,59 +458,64 @@ def test_email(request):
         return HttpResponse("Test email has been sent to your email address!")
     except Exception as e:
         return HttpResponse(f"Error sending email: {str(e)}")
-# API: return the percentage of the expense per month in the home page 
+# API: return the percentage of the expense per month in the home page
+
+
 @login_required
 def spending_summary(request):
 
-    user=request.user
-    today=now().date()
+    user = request.user
+    today = now().date()
 
     current_year = today.year
     current_month = today.month
 
-    expenses=Expense.objects.filter(
+    expenses = Expense.objects.filter(
         user=user,
-        date__year=current_year,  
-        date__month=current_month  
+        date__year=current_year,
+        date__month=current_month
     )
     result = expenses.aggregate(total=Sum('amount'))
-    total_spent = result.get('total', 0)  
+    total_spent = result.get('total', 0)
 
+    category_data = expenses.values(
+        'category__id', 'category__name').annotate(total=Sum('amount'))
 
-    category_data=expenses.values('category__id','category__name').annotate(total=Sum('amount'))
-
-    data=[
+    data = [
         {
             "category_id": category['category__id'],
-            "category":category['category__name'],
-            "amount":category['total'],
-            "percentage":round((category['total']/total_spent)*100,2) if total_spent>0 else 0 
+            "category": category['category__name'],
+            "amount": category['total'],
+            "percentage": round((category['total']/total_spent)*100, 2) if total_spent > 0 else 0
 
         }
         for category in category_data
     ]
     print(f"🟢 {current_year}-{current_month} expense data:", data)
 
-    return JsonResponse({"total_spent": total_spent,"categories":data})
+    return JsonResponse({"total_spent": total_spent, "categories": data})
+
 
 @login_required
 def upcoming_expenses(request):
-    
-    user=request.user
-    today=now().date()
 
-    upcoming_payments=UpcomingPayment.objects.filter(user=user,date__gte=today).order_by('date')[:3]
+    user = request.user
+    today = now().date()
 
-    data=[
+    upcoming_payments = UpcomingPayment.objects.filter(
+        user=user, date__gte=today).order_by('date')[:3]
+
+    data = [
         {
-           "category":payment.category.name,
-           "amount":payment.amount,
-           "due_date":payment.date.strftime("%d %b")
+            "category": payment.category.name,
+            "amount": payment.amount,
+            "due_date": payment.date.strftime("%d %b")
         }
         for payment in upcoming_payments
     ]
 
-    return JsonResponse({"upcoming_expenses":data})
+    return JsonResponse({"upcoming_expenses": data})
+
 
 @csrf_exempt
 @login_required
@@ -538,7 +530,7 @@ def expense_targets(request):
 
         if category_id:
             try:
-                category_id = int(category_id)  
+                category_id = int(category_id)
             except ValueError:
                 return JsonResponse({"error": "Invalid category_id"}, status=400)
 
@@ -556,9 +548,12 @@ def expense_targets(request):
             else:
                 return JsonResponse({"message": "No target found"}, status=404)
 
-        targets = MonthlyExpenseTarget.objects.filter(user=user, month=current_month)
-        expenses = Expense.objects.filter(user=user, date__year=current_year, date__month=current_month).values('category').annotate(total=Sum('amount'))
-        expense_dict = {expense['category']: expense['total'] for expense in expenses}
+        targets = MonthlyExpenseTarget.objects.filter(
+            user=user, month=current_month)
+        expenses = Expense.objects.filter(user=user, date__year=current_year, date__month=current_month).values(
+            'category').annotate(total=Sum('amount'))
+        expense_dict = {expense['category']: expense['total']
+                        for expense in expenses}
 
         data = [
             {
@@ -575,24 +570,25 @@ def expense_targets(request):
     elif request.method == "POST":
         try:
             data = json.loads(request.body)
-            category_id = int (data.get("category"))
+            category_id = int(data.get("category"))
             amount = float(data.get("amount"))
-            month_str = data.get("month")  
+            month_str = data.get("month")
 
             category = get_object_or_404(ExpenseCategory, id=category_id)
 
             try:
-                month = int(month_str.split("-")[1]) 
+                month = int(month_str.split("-")[1])
             except (IndexError, ValueError):
                 return JsonResponse({"error": "Invalid month format. Expected YYYY-MM."}, status=400)
 
-            print(f"try to create MonthlyExpenseTarget: User={user.email}, Category={category.name}, Amount={amount}, Month={month}")
+            print(
+                f"try to create MonthlyExpenseTarget: User={user.email}, Category={category.name}, Amount={amount}, Month={month}")
 
             target = MonthlyExpenseTarget.objects.create(
                 user=user,
                 category=category,
                 amount=amount,
-                month=month 
+                month=month
             )
 
             print(f"Success: {target}")
@@ -604,15 +600,15 @@ def expense_targets(request):
             return JsonResponse({"error": str(e)}, status=400)
 
 
-
 @csrf_exempt
 @login_required
 def update_expense_target(request, target_id):
     try:
-        print(f"🔍 Debug: Received target_id = {target_id}") 
+        print(f"🔍 Debug: Received target_id = {target_id}")
 
-        target = get_object_or_404(MonthlyExpenseTarget, id=target_id, user=request.user)
-        print(f"Found target: {target}")  
+        target = get_object_or_404(
+            MonthlyExpenseTarget, id=target_id, user=request.user)
+        print(f"Found target: {target}")
 
         if request.method == "PUT":
             data = json.loads(request.body)
@@ -624,7 +620,7 @@ def update_expense_target(request, target_id):
             target.amount = float(amount)
             target.save()
 
-            print(f"Successfully updated: {target.amount}")  
+            print(f"Successfully updated: {target.amount}")
             return JsonResponse({"message": "Updated successfully", "id": target.id}, status=200)
 
     except Exception as e:
@@ -633,15 +629,17 @@ def update_expense_target(request, target_id):
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
+
 @login_required
 def categories(request):
-    print(f"User {request.user} requested categories") 
+    print(f"User {request.user} requested categories")
     categories = ExpenseCategory.objects.values("id", "name")
     return JsonResponse({"categories": list(categories)})
+
 
 @login_required
 def get_current_user(request):
     return JsonResponse({
         "user_id": request.user.id,
-        "username": getattr(request.user, "username", request.user.email) 
+        "username": getattr(request.user, "username", request.user.email)
     })

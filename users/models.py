@@ -31,7 +31,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)
     currency = models.ForeignKey(
-        'Currency', on_delete=models.SET_NULL, null=True)  # Foreign key to Currency
+        # Foreign key to Currency
+        'Currency', on_delete=models.SET_NULL, null=True)
     notification = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -50,7 +51,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Currency(models.Model):
     currency = models.CharField(
-        primary_key=True, max_length=3)  # e.g., USD, EUR
+        primary_key=True, max_length=3, default="USD")  # e.g., USD, EUR
     rate = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     # Store the timestamp as an integer
     timestamp = models.IntegerField(null=True, blank=True)
