@@ -13,7 +13,29 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import os
-import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+LOGIN_URL = 'login'
+SITE_ID = 2
+LOGIN_REDIRECT_URL = '/finance/home/' 
+# LOGOUT_REDIRECT_URL = 'home'
+ACCOUNT_LOGOUT_REDIRECT_URL = "/users/login/" 
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True  # Ensure it redirects after login
+ACCOUNT_ADAPTER = 'users.adapters.CustomAccountAdapter'  # Point to the custom adapter you created
+
+
+SOCIAL_AUTH_GOOGLE_CLIENT_ID = os.environ.get('SOCIAL_AUTH_GOOGLE_CLIENT_ID')
+SOCIAL_AUTH_GOOGLE_SECRET = os.environ.get('SOCIAL_AUTH_GOOGLE_SECRET')
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = "email"  # Disable the username field
+ACCOUNT_USERNAME_REQUIRED = False  # Don't require username
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+
+# # Additional settings
+ACCOUNT_EMAIL_REQUIRED = True  # Email is required
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,29 +60,24 @@ INSTALLED_APPS = [
     "users",
     "finance",
     "django.contrib.admin",
-    # "django.contrib.site",
+    "django.contrib.sites",
     "django.contrib.auth",
     "django.contrib.contenttypes",
+    'django_extensions',
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-
-    # google login functionality needs to be checked
-    # Django allauth
-    # 'django.contrib.sites',
-    # 'allauth',
-    # 'allauth.account',
-    # 'allauth.socialaccount',
-    # 'allauth.socialaccount.providers.google'
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google"
 ]
 
-# SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    # "allauth.account.middleware.AccountMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -74,7 +91,6 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         'DIRS': [BASE_DIR / "templates"],
-        "DIRS": [BASE_DIR / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -86,6 +102,23 @@ TEMPLATES = [
         },
     },
 ]
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'moneybees.pipeline.get_username',  # Custom function to generate username
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+)
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Using database for sessions (default)
+SESSION_COOKIE_AGE = 60 * 60 * 24  # 1 day (default)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 
 WSGI_APPLICATION = "moneybees.wsgi.application"
 
@@ -164,3 +197,18 @@ PASSWORD_RESET_TIMEOUT = 86400  # 1 day in seconds
 
 
 AUTH_USER_MODEL = 'users.User'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend'
+]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        # 'AUTH_PARAMS': {'access_type': 'online'},
+        'AUTH_PARAMS': {'prompt': 'select_account'},
+        'OAUTH_PKCE_ENABLED': True,
+    }
+}
+SOCIALACCOUNT_LOGIN_ON_GET = True

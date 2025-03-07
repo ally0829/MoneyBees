@@ -2,6 +2,13 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout, get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import SignUpForm
+from allauth.socialaccount.providers.google.views import OAuth2LoginView
+from django.urls import reverse
+from allauth.socialaccount.models import SocialAccount
+from django.contrib.auth import login
+from django.http import HttpResponse
+
+
 
 User = get_user_model()
 
@@ -31,9 +38,32 @@ def login_view(request):
                 return redirect('finance:home')
     else:
         form = AuthenticationForm()
-    return render(request, 'users/login.html', {'form': form})
+        
+    return render(request, 'users/login.html', {
+        'form': form,
+        })
 
 
 def logout_view(request):
     logout(request)
+    
+    # Check if the user is authenticated through Google (i.e., if they have a SocialAccount)
+    if request.user.is_authenticated and hasattr(request.user, 'socialaccount'):
+        return redirect('https://accounts.google.com/Logout')  # Redirect to Google logout if they logged in via Google
+
+    # If the user didn't log in through Google, just redirect them to the login page
     return redirect('login')
+
+
+def google_login_callback(request):
+    if request.user.is_authenticated:
+        return redirect('finance:home')  # Redirect to the home page
+
+    try:
+        social_account = SocialAccount.objects.get(user=request.user)
+        user = social_account.user
+        login(request, user)  # Ensure user is logged in
+        return redirect('finance:home')
+    except SocialAccount.DoesNotExist:
+        return redirect('login')
+

@@ -7,5 +7,6 @@ urlpatterns = [
     path("", lambda request: redirect("login"), name="home"),
     path("users/", include("users.urls")),
     path("finance/", include("finance.urls")),
-    path("api/",include("finance.urls"))
+    path("api/",include("finance.urls")),
+    path('accounts/', include('allauth.urls')),
 ]

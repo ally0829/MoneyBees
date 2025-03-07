@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import authenticate
 
 User = get_user_model()
 
@@ -48,7 +49,6 @@ class LoginForm(AuthenticationForm):
         email = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
         if email and password:
-            from django.contrib.auth import authenticate
             user = authenticate(email=email, password=password)
             if not user:
                 raise forms.ValidationError("Invalid email or password.")
