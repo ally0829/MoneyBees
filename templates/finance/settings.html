@@ -11,6 +11,12 @@
 {% block main %}
 <div class="settings">
     {% comment %} {{exchange_rates}} {% endcomment %}
+  {% comment %} <div> 100 * {{ user.currency.rate }} = {% widthratio 100 1 user.currency.rate %}</div> {% endcomment %}
+{% comment %} {% else %}
+  <div>No currency selected.</div>
+{% endif %} {% endcomment %}
+    
+
     <form method="POST" action={% url 'finance:settings' %}  id="settings-form">
         {% csrf_token %}
         <div class="gridBox">

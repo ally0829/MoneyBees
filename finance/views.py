@@ -28,6 +28,20 @@ from users.models import Currency
 # Set up logging
 logger = logging.getLogger(__name__)
 
+
+@csrf_exempt
+def toggle_notifications(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            profile = User.objects.get(user=request.user)
+            profile.notifications_enabled = data.get("enabled", False)
+            profile.save()
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
+
 def get_exchange_rate(request):
     # Your API key (store it in settings.py for security)
     api_key = settings.EXCHANGE_RATE_API_KEY
@@ -74,10 +88,11 @@ def home_view(request):
     return render(request, 'finance/homepage.html', {"show_topbar": True})
 
 def profile_view(request):
-    profile, created = User.objects.get_or_create(user=request.user)
+    # Get the current user
+    user = request.user
     return render(request, 'finance/profile.html', {
         "show_topbar": False,
-        "notifications_enabled": profile.notifications_enabled,
+        "notifications_enabled": user.notification,  # Pass the `notification` field
     })
 
 @csrf_exempt
@@ -85,9 +100,9 @@ def toggle_notifications(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            profile = User.objects.get(user=request.user)
-            profile.notifications_enabled = data.get("enabled", False)
-            profile.save()
+            user = request.user  # Get the logged-in user
+            user.notification = data.get("enabled", False)  # Update the `notification` field
+            user.save()  # Save the changes
             return JsonResponse({"status": "success"})
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
@@ -131,6 +146,7 @@ def settings_view(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         selected_currency = request.POST.get('currency')
+
         
         # Update the User model
         if first_name:
@@ -142,15 +158,26 @@ def settings_view(request):
         if password:  # Update password if provided
             user.set_password(password)
             update_session_auth_hash(request, user)  # Keep the user logged in
+        # if selected_currency:
+        #     try:
+        #         # Get or create the Currency object
+        #         currency, created = Currency.objects.get_or_create(currency=selected_currency)
+        #         user.currency = currency  # Assign the Currency object
+        #     except Exception as e:
+        #         messages.error(request, f"Invalid currency: {selected_currency}")
         if selected_currency:
             try:
                 # Get or create the Currency object
                 currency, created = Currency.objects.get_or_create(currency=selected_currency)
+                # Update the rate if the currency exists in the API response
+                if exchange_rates.get("rates") and selected_currency in exchange_rates["rates"]:
+                    currency.rate = exchange_rates["rates"][selected_currency]
+                    currency.save()
                 user.currency = currency  # Assign the Currency object
             except Exception as e:
                 messages.error(request, f"Invalid currency: {selected_currency}")
         user.save()
-
+        print(f"User {user.email} currency set to: {user.currency.currency} with rate: {user.currency.rate}")  # Debugging
         # Add a success message
         messages.success(request, "Settings updated successfully!")
 
@@ -278,13 +305,24 @@ def delete_expense(request, expense_id):
     })
 
 
+from django.db.models import Sum
+from datetime import datetime
+from django.shortcuts import render
+from .models import Expense, ExpenseCategory
+
 def expense_record_view(request):
+    user = request.user
+
+    # Fetch all categories and expenses
     categories = ExpenseCategory.objects.all()
     expenses = Expense.objects.all()
 
+    # Get filter parameters from the request
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     category = request.GET.get('category')
+
+    # Parse dates if provided
     try:
         if start_date:
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
@@ -293,6 +331,7 @@ def expense_record_view(request):
     except ValueError:
         start_date, end_date = None, None
 
+    # Apply date filters
     if start_date and end_date:
         expenses = expenses.filter(date__range=[start_date, end_date])
     elif start_date:
@@ -300,16 +339,33 @@ def expense_record_view(request):
     elif end_date:
         expenses = expenses.filter(date__lte=end_date)
 
+    # Apply category filter
     if category and category != "ALL":
         expenses = expenses.filter(category__name=category)
 
-    total_amount = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
+    # Convert amounts to the user's currency
+    exchange_rate = user.currency.rate  # Get the exchange rate from the user's selected currency
+    converted_expenses = []
+    for expense in expenses:
+        converted_amount = expense.amount * exchange_rate
+        converted_expenses.append({
+            'id': expense.id,
+            'category': expense.category,
+            'date': expense.date,
+            'amount': converted_amount,  # Converted amount
+            'description': expense.description,
+        })
 
+    # Calculate total amount (in the user's currency)
+    total_amount = sum(expense['amount'] for expense in converted_expenses)
+
+    # Pass data to the template
     return render(request, 'finance/expenseRecord.html', {
         'categories': categories,
-        'expenses': expenses,
+        'expenses': converted_expenses,  # Pass the converted expenses
         'total_amount': total_amount,
-        "show_topbar": True
+        'show_topbar': True,
+        'user': user,  # Ensure the user object is passed to the template
     })
 
 #  load Upcoming Expense page，including Category & Payments

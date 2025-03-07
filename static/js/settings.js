@@ -88,8 +88,8 @@ document.getElementById("cancel").onclick = function() {
     };
 
     // Function to check if the form has changed
-    function checkFormChanges() {
-        const currentValues = {
+function checkFormChanges() {
+    const currentValues = {
             first_name: form.querySelector('[name="first_name"]').value,
             last_name: form.querySelector('[name="last_name"]').value,
             email: form.querySelector('[name="email"]').value,

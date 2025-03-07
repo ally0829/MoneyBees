@@ -24,7 +24,7 @@ SECRET_KEY = "django-insecure-2z=$73p3gi!_!6z#)$bq)*8k%(i2(#^+%ghx)vj@lgt!&a5+b%
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-EXCHANGE_RATE_API_KEY = "db182e54f6c67865d0a9db5ebe11036b"
+EXCHANGE_RATE_API_KEY = "f17d6d555253fb8453ee5bd4c7a321e4"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -90,7 +90,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "moneybees.wsgi.application"
 
-EXCHANGE_RATE_API_KEY = "2766f9e7423debacfa6ac1c8b83f49a1"
+
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 

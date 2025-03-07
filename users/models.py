@@ -50,6 +50,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Currency(models.Model):
     currency = models.CharField(primary_key=True, max_length=3)  # e.g., USD, EUR
+    rate = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     class Meta:
         verbose_name_plural = "currency"
