@@ -46,6 +46,12 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
+    
+    # Check if the user is authenticated through Google (i.e., if they have a SocialAccount)
+    if request.user.is_authenticated and hasattr(request.user, 'socialaccount'):
+        return redirect('https://accounts.google.com/Logout')  # Redirect to Google logout if they logged in via Google
+
+    # If the user didn't log in through Google, just redirect them to the login page
     return redirect('login')
 
 

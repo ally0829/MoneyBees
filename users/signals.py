@@ -14,14 +14,8 @@ def update_user_profile(sender, instance, created, **kwargs):
     if created:  # Only run when the account is first created
         user = instance.user
         google_data = instance.extra_data  # Google API Data
-        
-        print("Google Data:", google_data)
-
         user.firstname = google_data.get('given_name', user.firstname or "Google User")
         user.lastname = google_data.get('family_name', user.lastname or "*")
-        
         user.is_staff = True
-        
-        print(f"Updating user: {user.email}, is_staff={user.is_staff}, firstname={user.firstname}, lastname={user.lastname}")
 
         user.save()
