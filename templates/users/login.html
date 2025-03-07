@@ -1,3 +1,4 @@
+{% load socialaccount %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -40,10 +41,9 @@
 
                 <p class="signup-text">Don't have an account? <a href="{% url 'signup' %}">Sign up here</a></p>
                 <!--<div class="separator">Or</div>-->
-
-                <button class="btn-google">
+                <button class="btn-google" onclick="window.location.href='{% provider_login_url 'google' %}'">
                     <img src="{% static 'images/google-icon.png' %}" alt="Google Icon"> Sign in with Google
-                </button>
+                </button>                
                 <a href="{% url 'password_reset' %}" class="forgot-password">Forgot your password?</a>
             </form>
         </div>

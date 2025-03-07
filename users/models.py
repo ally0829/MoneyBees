@@ -57,3 +57,24 @@ class Currency(models.Model):
 
     def __str__(self):
         return self.currency
+    
+
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, firstname=None, lastname=None, password=None):
+        """Create and return a regular user with email and password."""
+        if not email:
+            raise ValueError("Users must have an email address")
+        
+        firstname = firstname or "Google"  # Default if missing
+        lastname = lastname or "User"  # Default if missing
+        
+        user = self.model(email=self.normalize_email(email),
+                          firstname=firstname, lastname=lastname)
+        if password:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()  # This allows Google users to log in without a password
+
+        user.is_active = True
+        user.save(using=self._db)
+        return user
