@@ -31,7 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)
     currency = models.ForeignKey(
-        'Currency', on_delete=models.SET_NULL, null=True,  default="EUR" )  # Foreign key to Currency
+        'Currency', on_delete=models.SET_NULL, null=True)  # Foreign key to Currency
     notification = models.BooleanField( default = False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -51,9 +51,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Currency(models.Model):
     currency = models.CharField(primary_key=True, max_length=3)  # e.g., USD, EUR
     rate = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    timestamp = models.IntegerField(null=True, blank=True)  # Store the timestamp as an integer
 
     class Meta:
         verbose_name_plural = "currency"
 
     def __str__(self):
         return self.currency
+
+    # def get_timestamp_as_datetime(self):
+    #     """Convert the timestamp to a human-readable datetime."""
+    #     from datetime import datetime
+    #     if self.timestamp:
+    #         return datetime.fromtimestamp(self.timestamp)
+    #     return None

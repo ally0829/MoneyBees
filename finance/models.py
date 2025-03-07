@@ -1,8 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from users.models import User
-from djmoney.models.fields import MoneyField
-
+from users.models import Currency
 
 class ExpenseCategory(models.Model):
     id = models.AutoField(primary_key=True)
@@ -33,6 +32,7 @@ class Income(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date = models.DateField()
     description = models.CharField(max_length=256, default="")
+    currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True)  
     category = models.ForeignKey(
         IncomeCategory, on_delete=models.CASCADE, default=1)
 
@@ -50,6 +50,7 @@ class Expense(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date = models.DateField()
     description = models.CharField(max_length=255, null=True, blank=True)
+    currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True)  
 
     class Meta:
         verbose_name_plural = "expense"
