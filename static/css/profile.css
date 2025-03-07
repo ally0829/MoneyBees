@@ -126,3 +126,49 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+dialog {
+  width: 800px;
+  max-width: 80%;
+  padding: 30px;
+  border-radius: 10px;
+  border: none;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+
+#closeContactDialogBtn {
+  margin-top: 15px;
+  padding: 8px 15px;
+  border: none;
+  background-color: black;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+#closeContactDialogBtn:hover {
+  background-color: #333;
+}
+
+dialog p {
+  font-size: 24px;
+}
+dialog ul {
+  font-size: 18px;
+}
