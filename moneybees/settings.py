@@ -19,11 +19,12 @@ load_dotenv()
 
 LOGIN_URL = 'login'
 SITE_ID = 2
-LOGIN_REDIRECT_URL = '/finance/home/' 
+LOGIN_REDIRECT_URL = '/finance/home/'
 # LOGOUT_REDIRECT_URL = 'home'
-ACCOUNT_LOGOUT_REDIRECT_URL = "/users/login/" 
+ACCOUNT_LOGOUT_REDIRECT_URL = "/users/login/"
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True  # Ensure it redirects after login
-ACCOUNT_ADAPTER = 'users.adapters.CustomAccountAdapter'  # Point to the custom adapter you created
+# Point to the custom adapter you created
+ACCOUNT_ADAPTER = 'users.adapters.CustomAccountAdapter'
 
 
 SOCIAL_AUTH_GOOGLE_CLIENT_ID = os.environ.get('SOCIAL_AUTH_GOOGLE_CLIENT_ID')
@@ -67,14 +68,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-<<<<<<< HEAD
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google"
-=======
-
->>>>>>> fc19ca6 (save to change)
 ]
 
 
@@ -119,7 +116,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
 )
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Using database for sessions (default)
+# Using database for sessions (default)
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_AGE = 60 * 60 * 24  # 1 day (default)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
