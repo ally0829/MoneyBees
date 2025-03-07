@@ -4,6 +4,13 @@ document.getElementById("inpb1").onclick = function (event) {
     event.stopPropagation();
 };
 
+document.getElementById("inpb5").onclick = function (event) {
+    hidePassword(event); // Hide password if another field is clicked
+    toggleInput("inp5");
+    event.stopPropagation();
+};
+
+
 document.getElementById("inpb2").onclick = function (event) {
     hidePassword(event); // Hide password if another field is clicked
     toggleInput("inp2");
@@ -66,3 +73,48 @@ document.getElementById("closeDialog").onclick = function() {
 document.getElementById("cancel").onclick = function() {
     document.getElementById("deleteButtonDialog").close();
 }
+
+    // Get references to the form and confirm button
+    const form = document.getElementById('settings-form');
+    const confirmBtn = document.getElementById('confirm-btn');
+
+    // Get the initial values of the form fields
+    const initialValues = {
+        first_name: form.querySelector('[name="first_name"]').value,
+        last_name: form.querySelector('[name="last_name"]').value,
+        email: form.querySelector('[name="email"]').value,
+        password: form.querySelector('[name="password"]').value,
+        currency: form.querySelector('[name="currency"]').value,
+    };
+
+    // Function to check if the form has changed
+function checkFormChanges() {
+    const currentValues = {
+            first_name: form.querySelector('[name="first_name"]').value,
+            last_name: form.querySelector('[name="last_name"]').value,
+            email: form.querySelector('[name="email"]').value,
+            password: form.querySelector('[name="password"]').value,
+            currency: form.querySelector('[name="currency"]').value,
+        };
+
+        // Compare initial values with current values
+        const hasChanges = Object.keys(initialValues).some(
+            key => initialValues[key] !== currentValues[key]
+        );
+
+        // Show or hide the Confirm button based on changes
+        if (hasChanges) {
+            confirmBtn.style.display = 'block';
+        } else {
+            confirmBtn.style.display = 'none';
+        }
+    }
+
+    // Add event listeners to form fields
+    form.querySelectorAll('input, select').forEach(field => {
+        field.addEventListener('input', checkFormChanges);
+        field.addEventListener('change', checkFormChanges);
+    });
+
+    // Initial check in case the form is pre-filled with changes
+    checkFormChanges();

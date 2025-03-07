@@ -31,8 +31,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)
     currency = models.ForeignKey(
-        'Currency', on_delete=models.SET_NULL, null=True)
-
+        'Currency', on_delete=models.SET_NULL, null=True)  # Foreign key to Currency
+    notification = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -49,32 +49,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Currency(models.Model):
-    id = models.AutoField(primary_key=True)
-    currency = models.CharField(max_length=128)
+    currency = models.CharField(
+        primary_key=True, max_length=3)  # e.g., USD, EUR
+    rate = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    # Store the timestamp as an integer
+    timestamp = models.IntegerField(null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "currency"
 
     def __str__(self):
         return self.currency
-    
-
-class CustomUserManager(BaseUserManager):
-    def create_user(self, email, firstname=None, lastname=None, password=None):
-        """Create and return a regular user with email and password."""
-        if not email:
-            raise ValueError("Users must have an email address")
-        
-        firstname = firstname or "Google"  # Default if missing
-        lastname = lastname or "User"  # Default if missing
-        
-        user = self.model(email=self.normalize_email(email),
-                          firstname=firstname, lastname=lastname)
-        if password:
-            user.set_password(password)
-        else:
-            user.set_unusable_password()  # This allows Google users to log in without a password
-
-        user.is_active = True
-        user.save(using=self._db)
-        return user

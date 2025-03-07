@@ -9,13 +9,15 @@
 {% endblock %}
 
 {% block main %}
+
+{% comment %} {{notifications_enabled }} {% endcomment %}
 <div class="profile">
         <div class="profile-fullName">
             <svg  width="80" height="80" fill="currentColor" viewBox="0 0 16 16" style=" margin: 20px 40px 20px 40px;">
                 <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
                 <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
               </svg>
-              <div style="margin-left: 20px">Full Name</div>
+              <div style="margin-left: 20px">{{user.firstname}} {{user.lastname}}</div>
             </div>
         <button class="black-textBox" id="settingsButton">
             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 16 16" >
@@ -55,10 +57,9 @@
 {% comment %} Dialog Box {% endcomment %}
 <dialog id="notifDialog">
   <h2>Enable Notification?</h2>
-  {% comment %} <p>This is a simple dialog box.</p> {% endcomment %}
+  <h5>By enabling the notification you will receive an email notification when payment is due in 3 days</h5>
   <label class="switch">
-    {% comment %} <h3>click to enable notificationButton</h3> {% endcomment %}
-    <input type="checkbox" checked>
+    <input type="checkbox" id="notifToggle" {% if notifications_enabled %}checked{% endif %}>
     <span class="slider round"></span>
   </label></br>
   <button id="closeNotifDialogBtn">Close</button>
@@ -80,5 +81,29 @@
   document.getElementById("FAQ").onclick = function() {
     location.href = "/finance/faq";  
   };
+
+  document.getElementById("notifToggle").addEventListener("change", function() {
+    const isEnabled = this.checked;
+
+    fetch("{% url 'finance:toggle_notifications' %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ enabled: isEnabled }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === "success") {
+        alert("Notification preferences updated successfully.");
+      } else {
+        alert("Failed to update notification preferences.");
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
+  });
 </script>
 {% endblock %} 

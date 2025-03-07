@@ -3,8 +3,7 @@ from django.core.management.base import BaseCommand
 from django.core.mail import send_mail
 from django.conf import settings
 from datetime import datetime, timedelta
-from finance.models import UpcomingPayment
-
+from finance.models import UpcomingPayment, User
 
 class Command(BaseCommand):
     help = 'Send email notifications for upcoming payments'
@@ -22,31 +21,36 @@ class Command(BaseCommand):
         # Send email for each payment
         for payment in upcoming_payments:
             user = payment.user
-            if user.email:
-                subject = f"Upcoming Payment Reminder: {payment.category.name}"
-                message = f"""
-Hi {user.firstname},
+            try:
+                profile = User.objects.get(user=user)
+                if profile.notifications_enabled and user.email:
+                    subject = f"Upcoming Payment Reminder: {payment.category.name}"
+                    message = f"""
+                    Hi {user.firstname},
 
-This is a reminder that you have an upcoming payment in 3 days:
+                    This is a reminder that you have an upcoming payment in 3 days:
 
-Category: {payment.category.name}
-Amount: {payment.amount}
-Date: {payment.date}
-Description: {payment.description}
+                    Category: {payment.category.name}
+                    Amount: {payment.amount}
+                    Date: {payment.date}
+                    Description: {payment.description}
 
-Thank you for using MoneyBees!
-"""
+                    Thank you for using MoneyBees!
+                    """
 
-                send_mail(
-                    subject=subject,
-                    message=message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[user.email],
-                    fail_silently=False,
-                )
-                notifications_sent += 1
+                    send_mail(
+                        subject=subject,
+                        message=message,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[user.email],
+                        fail_silently=False,
+                    )
+                    notifications_sent += 1
+            except User.DoesNotExist:
+                # If the user doesn't have a profile, skip them
+                continue
 
         self.stdout.write(
             self.style.SUCCESS(
-                f'sent {notifications_sent} payment notifications')
+                f'Sent {notifications_sent} payment notifications')
         )

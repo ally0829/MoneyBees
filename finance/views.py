@@ -2,65 +2,219 @@ from django.shortcuts import redirect, render, get_object_or_404
 import json
 from django.conf import settings
 from finance.forms import IncomeForm, ExpenseForm
-from finance.models import Income, Expense, ExpenseCategory, MonthlyExpenseTarget, IncomeCategory, User, UpcomingPayment
+from finance.models import Income, Expense, ExpenseCategory, MonthlyExpenseTarget, IncomeCategory, UpcomingPayment
 from django.db.models import Sum
 from datetime import datetime
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail, EmailMessage
+from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.utils.timezone import now
-from datetime import timedelta
 import logging
-
+from django.shortcuts import render, redirect
+from django.contrib import messages
+# from users.models import Currency
 logger = logging.getLogger(__name__)
 # Create your views here.
+from users.models import User
+from django.contrib.auth import update_session_auth_hash
+# views.py
+import requests
+from django.http import JsonResponse
+from django.conf import settings
+from users.models import Currency
+from django.shortcuts import render
+from .models import ExchangeRate
+# Set up logging
+logger = logging.getLogger(__name__)
 
+
+def fetch_exchange_rates():
+    """
+    Fetches the latest exchange rates from the API.
+    Returns a dictionary containing the exchange rates and metadata.
+    """
+    api_key = settings.EXCHANGE_RATE_API_KEY
+    url = f"http://api.exchangeratesapi.io/v1/latest?access_key={api_key}"
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        data = response.json()
+
+        return {
+            "success": data.get("success"),
+            "timestamp": data.get("timestamp"),
+            "base": data.get("base"),
+            "date": data.get("date"),
+            "rates": data.get("rates"),
+        }
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to fetch exchange rates: {e}")
+        return {}  # Return an empty dictionary in case of failure
+
+@csrf_exempt
+def toggle_notifications(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            profile = User.objects.get(user=request.user)
+            profile.notifications_enabled = data.get("enabled", False)
+            profile.save()
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
+
+def get_exchange_rate(request):
+    # Your API key (store it in settings.py for security)
+    api_key = settings.EXCHANGE_RATE_API_KEY
+    url = f"http://api.exchangeratesapi.io/v1/latest?access_key={api_key}"
+
+    # Make the API request
+        # Make the API request
+    response = requests.get(url)
+        #convert json to object
+    response = response.json()
+    print(response)
+    items=response["Items"]
+    print(items)
+    
+    json_itmes = []
+
+    for item in items:
+        currency = item["Item"]
+        json_itmes.append({
+            "success": currency["success"],
+            "timestamp": currency["timestamp"],
+            "base": currency["base"],
+            "date": currency["date"],
+            "rates": currency["rates"]
+        })
+    
+    json_items = json.dump(json_items)
+
+    return JsonResponse({"items": json_items}, status=200)
+
+
+
+# finance/views.py
+
+# from .utils import fetch_exchange_rates
+
+def currency_converter(request):
+    usd_to_eur = ExchangeRate.objects.get(base_currency='USD', target_currency='EUR').rate
+    context = {'usd_to_eur': usd_to_eur}
+    return render(request, 'converter.html', context)
 
 def home_view(request):
     return render(request, 'finance/homepage.html', {"show_topbar": True})
 
 def profile_view(request):
-    return render(request, 'finance/profile.html', {"show_topbar": False})
+    # Get the current user
+    user = request.user
+    return render(request, 'finance/profile.html', {
+        "show_topbar": False,
+        "notifications_enabled": user.notification,  # Pass the `notification` field
+    })
+
+@csrf_exempt
+def toggle_notifications(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            user = request.user  # Get the logged-in user
+            user.notification = data.get("enabled", False)  # Update the `notification` field
+            user.save()  # Save the changes
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
+
+
 
 
 def settings_view(request):
-    # Get the absolute path of the JSON file
-    json_path = settings.DATA_DIR / 'currencies.json'
+    # Fetch exchange rates using the utility function
+    exchange_rates = fetch_exchange_rates()
 
-    # Load the JSON data
-    with open(json_path, 'r', encoding='utf-8') as f:
-        currencies = json.load(f)
+    user = request.user
 
-    return render(request, 'finance/settings.html', {'currencies': currencies})
+    # Handle form submission
+    if request.method == 'POST':
+        # Log form data
+        logger.info("Form data submitted:")
+        for key, value in request.POST.items():
+            logger.info(f"{key}: {value}")
 
+        # Get form data
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        selected_currency = request.POST.get('currency')
+
+        # Update the User model
+        if first_name:
+            user.firstname = first_name  # Use `firstname` (not `first_name`)
+        if last_name:
+            user.lastname = last_name  # Use `lastname` (not `last_name`)
+        if email:
+            user.email = email
+        if password:  # Update password if provided
+            user.set_password(password)
+            update_session_auth_hash(request, user)  # Keep the user logged in
+
+        if selected_currency:
+            try:
+                # Get or create the Currency object
+                currency, created = Currency.objects.get_or_create(currency=selected_currency)
+                # Update the rate and timestamp if the currency exists in the API response
+                if exchange_rates.get("rates") and selected_currency in exchange_rates["rates"]:
+                    currency.rate = exchange_rates["rates"][selected_currency]
+                    currency.timestamp = exchange_rates.get("timestamp")  # Corrected timestamp assignment
+                    currency.save()
+                user.currency = currency  # Assign the Currency object
+            except Exception as e:
+                logger.error(f"Error updating currency: {e}")
+                messages.error(request, f"Invalid currency: {selected_currency}")
+
+        user.save()
+        print(f"User {user.email} currency set to: {user.currency.currency} with rate: {user.currency.rate}")  # Debugging
+        # Add a success message
+        messages.success(request, "Settings updated successfully!")
+
+        # Redirect to the same page to avoid form resubmission
+        return redirect('finance:settings')
+
+    # Pass the exchange_rates dictionary to the template
+    context = {
+        'exchange_rates': exchange_rates,
+        'user': user
+    }
+
+    return render(request, 'finance/settings.html', context)
 
 def faq_view(request):
     return render(request, 'finance/faq.html')
 
 
-def add_income(request):
-    if request.method == 'POST':
-        income_form = IncomeForm(request.POST)
-        if income_form.is_valid():
-            # Process the form data here
-            print(income_form.cleaned_data)
-            # get the income category from the form
-            category = IncomeCategory.objects.get(
-                name=income_form.cleaned_data['category'])
-            income = Income(
-                user=request.user,
-                amount=income_form.cleaned_data['amount'],
-                category=category,
-                date=income_form.cleaned_data['date'],
-                description=income_form.cleaned_data['description']
-            )
-            income.save()
 
+def add_income(request):
+    # Fetch exchange rates using the utility function
+    exchange_rates = fetch_exchange_rates()
+
+    if request.method == 'POST':
+        income_form = IncomeForm(request.POST, initial={'user': request.user}, exchange_rates=exchange_rates)
+        if income_form.is_valid():
+            income = income_form.save(commit=False)
+            income.user = request.user
+            income.save()
             return redirect('finance:add_income')
     else:
-        income_form = IncomeForm(initial={'user': request.user})
+        income_form = IncomeForm(initial={'user': request.user}, exchange_rates=exchange_rates)
+
     return render(request, 'finance/add_expense_income.html', {
         "show_topbar": True,
         "form": income_form,
@@ -69,12 +223,15 @@ def add_income(request):
 
 
 def add_expense(request):
+    # Fetch exchange rates using the utility function
+    exchange_rates = fetch_exchange_rates()
+
     if request.method == 'POST':
-        expense_form = ExpenseForm(request.POST)
+        expense_form = ExpenseForm(request.POST, initial={'user': request.user}, exchange_rates=exchange_rates)
         if expense_form.is_valid():
             # Process the form data here
             print(expense_form.cleaned_data)
-            # get the category from the form
+            # Get the category from the form
             category = ExpenseCategory.objects.get(
                 name=expense_form.cleaned_data['category'])
             expense = Expense(
@@ -82,21 +239,43 @@ def add_expense(request):
                 amount=expense_form.cleaned_data['amount'],
                 category=category,
                 date=expense_form.cleaned_data['date'],
-                description=expense_form.cleaned_data['description']
+                description=expense_form.cleaned_data['description'],
+                currency=Currency.objects.get(currency=expense_form.cleaned_data['currency'])  # Save the selected currency
             )
             expense.save()
 
             return redirect('finance:add_expense')
-
     else:
-        expense_form = ExpenseForm(initial={'user': request.user})
+        # Remove the trailing comma here
+        expense_form = ExpenseForm(initial={'user': request.user}, exchange_rates=exchange_rates)
+
     return render(request, 'finance/add_expense_income.html', {
         "show_topbar": True,
         "form": expense_form,
-        "type": "expense"})
-
+        "type": "expense"
+    })
 
 def edit_expense(request, expense_id):
+    api_key = settings.EXCHANGE_RATE_API_KEY
+    url = f"http://api.exchangeratesapi.io/v1/latest?access_key={api_key}"
+    # Make the API request
+    response = requests.get(url)
+    data = response.json()  # Convert JSON response to Python dictionary
+
+    user = request.user
+
+    if response.status_code == 200:
+        # Extract relevant data
+        exchange_rates = {
+            "success": data.get("success"),
+            "timestamp": data.get("timestamp"),
+            "base": data.get("base"),
+            "date": data.get("date"),
+            "rates": data.get("rates"),
+        }
+    else:
+        exchange_rates = {}  # Fallback in case of API failure
+
     # Get the expense instance that we want to edit
     expense = get_object_or_404(Expense, id=expense_id)
 
@@ -127,8 +306,9 @@ def edit_expense(request, expense_id):
         "form": expense_form,
         "type": "expense",
         "is_edit": True,  # Flag to indicate we're editing, not adding
-        "expense_id": expense_id  # Pass the expense ID to the template
-    })
+        "expense_id": expense_id,  # Pass the expense ID to the template,
+        "currency": exchange_rates
+        })
 
 
 def delete_expense(request, expense_id):
@@ -149,6 +329,8 @@ def delete_expense(request, expense_id):
 
 
 def expense_record_view(request):
+    user = request.user
+
     categories = ExpenseCategory.objects.all()
     expenses = Expense.objects.all()
 
@@ -168,18 +350,20 @@ def expense_record_view(request):
     elif start_date:
         expenses = expenses.filter(date__gte=start_date)
     elif end_date:
-        expenses = expenses.filter(date__lte=end_date)
+        expenses = expenses.filter(date__lte=end_date) * user.currency.rate
+
+        
 
     if category and category != "ALL":
         expenses = expenses.filter(category__name=category)
 
-    total_amount = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
+    total_amount = expenses.aggregate(Sum('amount'))['amount__sum'] * user.currency.rate or 0
 
     return render(request, 'finance/expenseRecord.html', {
         'categories': categories,
         'expenses': expenses,
         'total_amount': total_amount,
-        "show_topbar": True
+        "show_topbar": True,
     })
 
 #  load Upcoming Expense page，including Category & Payments

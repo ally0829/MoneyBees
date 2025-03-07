@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from users.models import User
-
+from users.models import Currency
 
 class ExpenseCategory(models.Model):
     id = models.AutoField(primary_key=True)
@@ -32,6 +32,7 @@ class Income(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date = models.DateField()
     description = models.CharField(max_length=256, default="")
+    currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True)  
     category = models.ForeignKey(
         IncomeCategory, on_delete=models.CASCADE, default=1)
 
@@ -49,6 +50,7 @@ class Expense(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date = models.DateField()
     description = models.CharField(max_length=255, null=True, blank=True)
+    currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True)  
 
     class Meta:
         verbose_name_plural = "expense"
@@ -82,3 +84,14 @@ class UpcomingPayment(models.Model):
         return f"{self.user.firstname} - {self.category.name} - {self.amount} on {self.date}"
     
 
+# users/models.py
+
+class ExchangeRate(models.Model):
+    success = models.BooleanField() #true false
+    timestamp = models.BigIntegerField() # 1741259771
+    base = models.CharField(max_length=3) # EUR
+    date = models.DateField() #"2025-03-06"
+    rates = models.JSONField()  # {AED: 3.231323 , AFN, 77.2323 etc...}
+
+    def __str__(self):
+        return f"Exchange rates for {self.base} on {self.date}"

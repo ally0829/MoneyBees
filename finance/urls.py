@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import edit_expense, mark_payment_paid, delete_expense, profile_view, add_income, add_expense, settings_view, expense_record_view, upcomingExpense_view, add_upcoming_payment, edit_upcoming_payment, delete_upcoming_payment, faq_view, home_view, test_email,spending_summary, upcoming_expenses, expense_targets,home_view,categories,get_current_user,update_expense_target
+from .views import edit_expense,toggle_notifications,update_expense_target, mark_payment_paid, delete_expense, profile_view, add_income, add_expense, settings_view, expense_record_view, upcomingExpense_view, add_upcoming_payment, edit_upcoming_payment, delete_upcoming_payment, faq_view, home_view, test_email,spending_summary, upcoming_expenses, expense_targets,home_view,categories,get_current_user
 
 app_name = "finance"
 urlpatterns = [
@@ -29,4 +29,5 @@ urlpatterns = [
     path("categories/", categories, name="categories"),
     path("get-current-user/", get_current_user, name="get-current-user"),
     path("expense-targets/<int:target_id>/", update_expense_target, name="update-expense-target"),
+    path("toggle-notifications/", toggle_notifications, name="toggle_notifications"),
 ]
