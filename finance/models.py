@@ -82,7 +82,8 @@ class UpcomingPayment(models.Model):
     date = models.DateField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(blank=True, null=True)
-
+    currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True)  # Add this field
+    
     def __str__(self):
         return f"{self.user.firstname} - {self.category.name} - {self.amount} on {self.date}"
 

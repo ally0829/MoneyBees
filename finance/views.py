@@ -168,7 +168,17 @@ def get_exchange_rate(request):
 
 
 def home_view(request):
-    return render(request, 'finance/homepage.html', {"show_topbar": True})
+    # Example: Fetch data for the charts
+    # categories = ExpenseCategory.objects.all()
+    expenses = Expense.objects.filter(user=request.user)
+    # total_spent = calculate_total_amount(request.user, expenses)
+
+    # Pass data to the template
+    return render(request, 'finance/homepage.html', {
+        "show_topbar": True,
+        # "categories": categories,
+        # "total_spent": total_spent,
+    })
 
 
 def profile_view(request):
@@ -444,34 +454,78 @@ def expense_record_view(request):
 
 #  load Upcoming Expense page，including Category & Payments
 
-
 @login_required
 def upcomingExpense_view(request):
+    # Fetch exchange rates using the utility function
+    exchange_rates = fetch_exchange_rates()
+
     categories = ExpenseCategory.objects.all()
     payments = UpcomingPayment.objects.filter(user=request.user)
+
     return render(request, 'finance/upcomingExpense.html', {
         "show_topbar": True,
         "categories": categories,
-        "payments": payments
+        "payments": payments,
+        "exchange_rates": exchange_rates  # Pass exchange rates to the template
     })
 
 
 #  API: new Upcoming Payment (front-end deliver AJAX use )
-@csrf_exempt  # avoid CSRF token restrict
+@csrf_exempt
 @login_required
 def add_upcoming_payment(request):
     if request.method == "POST":
         try:
+            # Parse the JSON data from the request body
             data = json.loads(request.body)
+            print("Received data:", data)  # Debug: Print the received data
+
+            # Validate required fields
+            required_fields = ["category", "date", "amount", "description", "currency"]
+            for field in required_fields:
+                if field not in data:
+                    return JsonResponse({"error": f"Missing required field: {field}"}, status=400)
+
+            # Fetch the category
             category = get_object_or_404(ExpenseCategory, id=data["category"])
+
+            # Fetch the selected currency from the request data
+            currency_code = data.get("currency")
+            if not currency_code:
+                return JsonResponse({"error": "Currency is required"}, status=400)
+
+            # Fetch exchange rates from the API
+            exchange_rates = fetch_exchange_rates()
+            if not exchange_rates.get("success"):
+                return JsonResponse({"error": "Failed to fetch exchange rates"}, status=400)
+
+            # Check if the selected currency exists in the API response
+            rates = exchange_rates.get("rates", {})
+            if currency_code not in rates:
+                return JsonResponse({"error": f"Currency {currency_code} not found in API response"}, status=400)
+
+            # Get or create the Currency object
+            currency, created = Currency.objects.get_or_create(
+                currency=currency_code,
+                defaults={
+                    "rate": rates[currency_code],  # Use the rate from the API
+                    "timestamp": exchange_rates.get("timestamp")  # Use the timestamp from the API
+                }
+            )
+
+            # Create the upcoming payment
             payment = UpcomingPayment.objects.create(
                 user=request.user,
                 category=category,
                 date=data["date"],
                 amount=data["amount"],
-                description=data["description"]
+                description=data["description"],
+                currency=currency  # Assign the fetched or created Currency object
             )
+
             return JsonResponse({"message": "Payment added", "id": payment.id})
+        except json.JSONDecodeError as e:
+            return JsonResponse({"error": "Invalid JSON data"}, status=400)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
 
@@ -486,10 +540,19 @@ def edit_upcoming_payment(request, payment_id):
                 UpcomingPayment, id=payment_id, user=request.user)
             data = json.loads(request.body)
             category = get_object_or_404(ExpenseCategory, id=data["category"])
+            currency_code = data.get("currency", "USD")  # Default to USD if not provided
+
+            # Get or create the Currency object
+            currency, created = Currency.objects.get_or_create(
+                currency=currency_code,
+                defaults={"rate": 1.0, "timestamp": 1698765432}  # Default values for new objects
+            )
+
             payment.category = category
             payment.date = data["date"]
             payment.amount = data["amount"]
             payment.description = data["description"]
+            payment.currency = currency  # Update the Currency object
             payment.save()
             return JsonResponse({"message": "Payment updated"})
         except Exception as e:
@@ -550,41 +613,83 @@ def test_email(request):
 # API: return the percentage of the expense per month in the home page
 
 
+from django.db.models import Sum
+from decimal import Decimal, ROUND_HALF_UP
+from datetime import datetime
+from django.http import JsonResponse
+from django.utils.timezone import now
+import logging
+
+logger = logging.getLogger(__name__)
+
 @login_required
 def spending_summary(request):
-
     user = request.user
     today = now().date()
 
     current_year = today.year
     current_month = today.month
 
+    # Fetch expenses for the current month
     expenses = Expense.objects.filter(
         user=user,
         date__year=current_year,
         date__month=current_month
     )
-    result = expenses.aggregate(total=Sum('amount'))
-    total_spent = result.get('total', 0)
 
-    category_data = expenses.values(
-        'category__id', 'category__name').annotate(total=Sum('amount'))
+    # Calculate the total amount in the user's default currency
+    total_spent = calculate_total_amount(user, expenses)
 
+    # Group expenses by category and calculate totals in the user's default currency
+    category_data = []
+    for expense in expenses:
+        if not expense.currency:
+            logger.error(f"Expense {expense.id} has no currency assigned.")
+            continue  # Skip this expense or handle it appropriately
+
+        # Convert the expense amount to the user's default currency
+        converted_amount = convert_to_default_currency(
+            amount=expense.amount,
+            expense_currency=expense.currency.currency,
+            default_currency=user.currency.currency,
+            transaction_date=expense.date
+        )
+
+        # Find or create the category in the category_data list
+        category_found = False
+        for category in category_data:
+            if category['category_id'] == expense.category.id:
+                category['total'] += converted_amount
+                category_found = True
+                break
+
+        if not category_found:
+            category_data.append({
+                "category_id": expense.category.id,
+                "category": expense.category.name,
+                "total": converted_amount
+            })
+
+    # Calculate percentages for each category
     data = [
         {
-            "category_id": category['category__id'],
-            "category": category['category__name'],
-            "amount": category['total'],
-            "percentage": round((category['total']/total_spent)*100, 2) if total_spent > 0 else 0
-
+            "category_id": category['category_id'],
+            "category": category['category'],
+            "amount": float(category['total']),  # Convert Decimal to float for JSON serialization
+            "percentage": round((category['total'] / total_spent) * 100, 2) if total_spent > 0 else 0
         }
         for category in category_data
     ]
+
+    # Debug the data
     print(f"🟢 {current_year}-{current_month} expense data:", data)
 
-    return JsonResponse({"total_spent": total_spent, "categories": data})
-
-
+    # Return the JSON response
+    return JsonResponse({
+        "total_spent": float(total_spent),  # Convert Decimal to float for JSON serialization
+        "currency_symbol": user.currency.currency,  # Include the currency symbol (e.g., AED, USD)
+        "categories": data
+    })
 @login_required
 def upcoming_expenses(request):
 
@@ -734,10 +839,20 @@ def get_current_user(request):
     })
 
 
+from django.db.models import Sum
+from decimal import Decimal, ROUND_HALF_UP
+from datetime import datetime
+from django.http import JsonResponse
+from django.utils.timezone import now
+import logging
+
+logger = logging.getLogger(__name__)
+
 @login_required
 def yearly_summary(request):
     """
-    Returns monthly income and expense summaries for the current year
+    Returns monthly income and expense summaries for the current year,
+    with all amounts converted to the user's default currency.
     """
     user = request.user
     today = now().date()
@@ -748,33 +863,58 @@ def yearly_summary(request):
     for month in range(1, 13):
         monthly_data.append({
             "month": month,
-            # Month abbreviation (Jan, Feb, etc.)
-            "month_name": datetime(current_year, month, 1).strftime('%b'),
-            "income": 0,
-            "expenses": 0
+            "month_name": datetime(current_year, month, 1).strftime('%b'),  # Month abbreviation (Jan, Feb, etc.)
+            "income": Decimal(0),  # Use Decimal for precision
+            "expenses": Decimal(0)  # Use Decimal for precision
         })
 
-    # Get income data for each month in current year
+    # Get income data for each month in the current year
     incomes = Income.objects.filter(
         user=user,
         date__year=current_year
-    ).values('date__month').annotate(total=Sum('amount'))
+    )
 
-    # Populate income data
+    # Convert income amounts to the user's default currency
     for income in incomes:
-        month_idx = income['date__month'] - 1  # Convert to 0-based index
-        monthly_data[month_idx]['income'] = float(income['total'])
+        if not income.currency:
+            logger.error(f"Income {income.id} has no currency assigned.")
+            continue  # Skip this income or handle it appropriately
 
-    # Get expense data for each month in current year
+        # Convert the income amount to the user's default currency
+        converted_amount = convert_to_default_currency(
+            amount=income.amount,
+            expense_currency=income.currency.currency,
+            default_currency=user.currency.currency,
+            transaction_date=income.date
+        )
+
+        # Add the converted amount to the corresponding month
+        month_idx = income.date.month - 1  # Convert to 0-based index
+        monthly_data[month_idx]['income'] += converted_amount
+
+    # Get expense data for each month in the current year
     expenses = Expense.objects.filter(
         user=user,
         date__year=current_year
-    ).values('date__month').annotate(total=Sum('amount'))
+    )
 
-    # Populate expense data
+    # Convert expense amounts to the user's default currency
     for expense in expenses:
-        month_idx = expense['date__month'] - 1  # Convert to 0-based index
-        monthly_data[month_idx]['expenses'] = float(expense['total'])
+        if not expense.currency:
+            logger.error(f"Expense {expense.id} has no currency assigned.")
+            continue  # Skip this expense or handle it appropriately
+
+        # Convert the expense amount to the user's default currency
+        converted_amount = convert_to_default_currency(
+            amount=expense.amount,
+            expense_currency=expense.currency.currency,
+            default_currency=user.currency.currency,
+            transaction_date=expense.date
+        )
+
+        # Add the converted amount to the corresponding month
+        month_idx = expense.date.month - 1  # Convert to 0-based index
+        monthly_data[month_idx]['expenses'] += converted_amount
 
     # Calculate yearly totals
     yearly_totals = {
@@ -782,6 +922,15 @@ def yearly_summary(request):
         "total_expenses": sum(item['expenses'] for item in monthly_data)
     }
 
+    # Convert Decimal values to float for JSON serialization
+    for item in monthly_data:
+        item['income'] = float(item['income'])
+        item['expenses'] = float(item['expenses'])
+
+    yearly_totals['total_income'] = float(yearly_totals['total_income'])
+    yearly_totals['total_expenses'] = float(yearly_totals['total_expenses'])
+
+    # Return the JSON response
     return JsonResponse({
         "monthly_data": monthly_data,
         "yearly_totals": yearly_totals

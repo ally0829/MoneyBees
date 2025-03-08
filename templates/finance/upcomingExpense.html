@@ -26,8 +26,16 @@
                     {% endfor %}
                 </select>
 
+                <label for="currency">Currency:</label>
+                <select name="currency" id="currency" required>
+                    {% for currency_code, rate in exchange_rates.rates.items %}
+                        <option value="{{ currency_code }}">{{ currency_code }}</option>
+                    {% endfor %}
+                </select>
+                
+
                 <label for="amount">Amount</label>
-                <input type="number" id="amount" name="amount" placeholder="{{user.currency.currency}} 0.0" required>
+                <input type="number" id="amount" name="amount" placeholder=" 0.0" required>
 
                 <label for="description">Description</label>
                 <textarea id="description" name="description"
@@ -56,7 +64,7 @@
                     <tr data-id="{{ payment.id }}">
                         <td data-category="{{ payment.category.id }}">{{ payment.category.name }}</td>
                         <td>{{ payment.date }}</td>
-                        <td>{{ payment.amount }}</td>
+                        <td>{{payment.currency.currency}}{{ payment.amount }}</td>
                         <td>{{ payment.description }}</td>
                         <td class="actions">
                             <button class="edit-btn">Edit</button>

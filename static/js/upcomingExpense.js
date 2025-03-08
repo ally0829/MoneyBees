@@ -22,13 +22,14 @@ async function savePayment(event) {
     let category = document.getElementById("category").value;
     let amount = document.getElementById("amount").value;
     let description = document.getElementById("description").value;
+    let currency = document.getElementById("currency").value;  // Add this line
 
     let url = paymentId ? `/finance/edit-payment/${paymentId}/` : "/finance/add-payment/";
     let method = "POST";
 
     let response = await fetch(url, {
         method: method,
-        body: JSON.stringify({ date, category, amount, description }),
+        body: JSON.stringify({ date, category, amount, description, currency }),  // Include currency
         headers: {
             "Content-Type": "application/json",
             "X-CSRFToken": getCookie("csrftoken")
@@ -53,12 +54,14 @@ function editPayment(event) {
     let date = row.cells[1].textContent;
     let amount = row.cells[2].textContent;
     let description = row.cells[3].textContent;
+    let currency = row.cells[4].textContent;  // Add this line
 
     document.getElementById("payment-id").value = paymentId;
     document.getElementById("category").value = category;
     document.getElementById("date").value = formatDate(date);
     document.getElementById("amount").value = amount;
     document.getElementById("description").value = description;
+    document.getElementById("currency").value = currency;  // Add this line
 
     document.getElementById("delete-btn").classList.remove("hidden");
     document.getElementById("delete-btn").addEventListener("click", function () {
@@ -122,3 +125,33 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+document.getElementById('add-payment-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = {
+        category: formData.get('category'),
+        amount: formData.get('amount'),
+        currency: formData.get('currency'),  // Ensure this is included
+        date: formData.get('date'),
+        description: formData.get('description'),
+    };
+
+    fetch("{% url 'add_upcoming_payment' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
+            window.location.reload();
+        } else {
+            alert(data.error);
+        }
+    });
+});

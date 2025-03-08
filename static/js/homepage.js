@@ -12,14 +12,14 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             console.log("Spending Summary Data:", data);
 
-
             totalSpentGlobal = Number(data.total_spent);
+            const currencySymbol = data.currency_symbol; 
 
             const labels = data.categories.map(category => category.category);
             const amounts = data.categories.map(category => Number(category.amount));
             const colors = ['#FFA500', '#FF4500', '#8A2BE2', '#1E90FF', '#FF1493'];
 
-            document.getElementById("chartCenterText").textContent = `$${totalSpentGlobal.toLocaleString()}`;
+            document.getElementById("chartCenterText").textContent = `${currencySymbol}${totalSpentGlobal.toLocaleString()}`;
 
             const categoryInfo = document.getElementById("categoryInfo");
             categoryInfo.innerHTML = "";
