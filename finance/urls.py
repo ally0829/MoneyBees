@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import yearly_summary, edit_expense, toggle_notifications, update_expense_target, mark_payment_paid, delete_expense, profile_view, add_income, add_expense, settings_view, expense_record_view, upcomingExpense_view, add_upcoming_payment, edit_upcoming_payment, delete_upcoming_payment, faq_view, home_view, test_email, spending_summary, upcoming_expenses, expense_targets, home_view, categories, get_current_user
+from .views import delete_income, edit_income, income_record_view, yearly_summary, edit_expense, toggle_notifications, update_expense_target, mark_payment_paid, delete_expense, profile_view, add_income, add_expense, settings_view, expense_record_view, upcomingExpense_view, add_upcoming_payment, edit_upcoming_payment, delete_upcoming_payment, faq_view, home_view, test_email, spending_summary, upcoming_expenses, expense_targets, home_view, categories, get_current_user
 
 app_name = "finance"
 urlpatterns = [
@@ -9,9 +9,13 @@ urlpatterns = [
     path("settings/", settings_view, name="settings"),
     path('faq/', faq_view, name='faq'),
     path('expense-record/', expense_record_view, name='expense_record'),
+    path('income-record/', income_record_view, name='income_record'),
     path('edit-expense/<int:expense_id>/', edit_expense, name='edit_expense'),
     path('delete-expense/<int:expense_id>/',
          delete_expense, name='delete_expense'),
+    path('edit-income/<int:income_id>/', edit_income, name='edit_income'),
+    path('delete-income/<int:income_id>/',
+         delete_income, name='delete_income'),
     path("upcomingExpense/", upcomingExpense_view, name="upcoming_expense"),
     path("add-payment/", add_upcoming_payment, name="add_payment"),
     path("edit-payment/<int:payment_id>/",

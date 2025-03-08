@@ -98,6 +98,7 @@ def get_exchange_rate(request):
     return JsonResponse({"items": json_items}, status=200)
 
 
+@login_required
 def home_view(request):
     return render(request, 'finance/homepage.html', {"show_topbar": True})
 
@@ -313,6 +314,62 @@ def edit_expense(request, expense_id):
     })
 
 
+def edit_income(request, income_id):
+    api_key = settings.EXCHANGE_RATE_API_KEY
+    url = f"http://api.exchangeratesapi.io/v1/latest?access_key={api_key}"
+    # Make the API request
+    response = requests.get(url)
+    data = response.json()  # Convert JSON response to Python dictionary
+
+    user = request.user
+
+    if response.status_code == 200:
+        # Extract relevant data
+        exchange_rates = {
+            "success": data.get("success"),
+            "timestamp": data.get("timestamp"),
+            "base": data.get("base"),
+            "date": data.get("date"),
+            "rates": data.get("rates"),
+        }
+    else:
+        exchange_rates = {}  # Fallback in case of API failure
+
+    # Get the expense instance that we want to edit
+    income = get_object_or_404(Income, id=income_id)
+
+    if request.method == 'POST':
+        # If form was submitted, process the form
+        income_form = IncomeForm(request.POST, instance=income)
+        if income_form.is_valid():
+            # Save the form but don't commit to the database yet
+            updated_income = income_form.save(commit=False)
+            # Make sure the user isn't changed
+            updated_income.user = income.user
+            # Now save to the database
+            updated_income.save()
+
+            # Redirect to expense record page after successful update
+            return redirect('finance:income_record')
+
+    else:
+        # Initialize form with the expense instance and user
+        income_form = IncomeForm(
+            instance=income,
+            # This provides the user for the currency label
+            initial={'user': income.user}
+        )
+
+    return render(request, 'finance/add_expense_income.html', {
+        "show_topbar": True,
+        "form": income_form,
+        "type": "income",
+        "is_edit": True,  # Flag to indicate we're editing, not adding
+        "income_id": income_id,
+        "currency": exchange_rates
+    })
+
+
 def delete_expense(request, expense_id):
     # Get the expense instance that we want to delete
     expense = get_object_or_404(Expense, id=expense_id)
@@ -326,6 +383,23 @@ def delete_expense(request, expense_id):
     # If it's a GET request, show confirmation page
     return render(request, 'finance/delete_expense_confirm.html', {
         'expense': expense,
+        'show_topbar': True
+    })
+
+
+def delete_income(request, income_id):
+    # Get the expense instance that we want to delete
+    income = get_object_or_404(Income, id=income_id)
+
+    if request.method == 'POST':
+        # Delete the expense
+        income.delete()
+        # Redirect to expense record page
+        return redirect('finance:income_record')
+
+    # If it's a GET request, show confirmation page
+    return render(request, 'finance/delete_income_confirm.html', {
+        'income': income,
         'show_topbar': True
     })
 
@@ -363,6 +437,44 @@ def expense_record_view(request):
     return render(request, 'finance/expenseRecord.html', {
         'categories': categories,
         'expenses': expenses,
+        'total_amount': total_amount,
+        "show_topbar": True,
+    })
+
+
+def income_record_view(request):
+    user = request.user
+
+    categories = IncomeCategory.objects.all()
+    incomes = Income.objects.all()
+
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    category = request.GET.get('category')
+    try:
+        if start_date:
+            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+        if end_date:
+            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+    except ValueError:
+        start_date, end_date = None, None
+
+    if start_date and end_date:
+        incomes = incomes.filter(date__range=[start_date, end_date])
+    elif start_date:
+        incomes = incomes.filter(date__gte=start_date)
+    elif end_date:
+        incomes = incomes.filter(date__lte=end_date) * user.currency.rate
+
+    if category and category != "ALL":
+        incomes = incomes.filter(category__name=category)
+
+    total_amount = incomes.aggregate(
+        Sum('amount'))['amount__sum'] * user.currency.rate or 0
+
+    return render(request, 'finance/incomeRecord.html', {
+        'categories': categories,
+        'incomes': incomes,
         'total_amount': total_amount,
         "show_topbar": True,
     })
