@@ -25,7 +25,76 @@ logger = logging.getLogger(__name__)
 # views.py
 # Set up logging
 # logger = logging.getLogger(__name__)
+from decimal import Decimal, ROUND_HALF_UP
+from django.db.models import Sum
 
+def fetch_historic_exchange_rate(date, base_currency, target_currency):
+    """
+    Fetch the historic exchange rate for a specific date.
+    """
+    api_key = settings.EXCHANGE_RATE_API_KEY
+    url = f"http://api.exchangeratesapi.io/v1/{date}?access_key={api_key}"
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        data = response.json()
+
+        data = data.get("rates", {}).get(target_currency)
+
+        return data
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to fetch exchange rates: {e}")
+        return {}  # Return an empty dictionary in case of failure
+
+
+def convert_to_default_currency(amount, expense_currency, default_currency, transaction_date):
+    """
+    Convert the given amount from expense_currency to default_currency
+    using the historic exchange rate for the transaction date.
+    """
+    if expense_currency == default_currency:
+        # No conversion needed
+        return Decimal(amount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+    # Fetch the historic exchange rate
+    exchange_rate = fetch_historic_exchange_rate(
+        date=transaction_date,
+        base_currency=default_currency,
+        target_currency=expense_currency
+    )
+
+    if not exchange_rate:
+        raise ValueError(f"Exchange rate not found for {expense_currency} on {transaction_date}.")
+
+    # Convert the amount to the default currency
+    converted_amount = Decimal(amount) / Decimal(exchange_rate)
+    return converted_amount.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+def calculate_total_amount(user, expenses):
+    """
+    Calculate the total amount of expenses in the user's default currency
+    using historic exchange rates.
+    """
+    default_currency = user.currency.currency
+    # total_amount = Decimal(0)
+    total_amount = 0
+    for expense in expenses:
+        if not expense.currency:
+            logger.error(f"Expense {expense.id} has no currency assigned.")
+            continue  # Skip this expense or handle it appropriately
+
+        # Convert each expense amount to the default currency
+        converted_amount = convert_to_default_currency(
+            amount=expense.amount,
+            expense_currency=expense.currency.currency,  # Access currency code
+            default_currency=default_currency,
+            transaction_date=expense.date # Format date as YYYY-MM-DD
+        )
+        total_amount += converted_amount
+
+
+    return total_amount
 
 def fetch_exchange_rates():
     """
@@ -333,8 +402,14 @@ def delete_expense(request, expense_id):
 def expense_record_view(request):
     user = request.user
 
+    # Ensure user has a valid currency
+
+
     categories = ExpenseCategory.objects.all()
-    expenses = Expense.objects.all()
+    expenses = Expense.objects.filter(user=user)
+    # expenses = Expense.objects.filter(user=user)
+
+    total_amount = calculate_total_amount(user, expenses)
 
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
@@ -357,8 +432,8 @@ def expense_record_view(request):
     if category and category != "ALL":
         expenses = expenses.filter(category__name=category)
 
-    total_amount = expenses.aggregate(
-        Sum('amount'))['amount__sum'] * user.currency.rate or 0
+    # total_amount = expenses.aggregate(
+    #     Sum('amount'))['amount__sum']
 
     return render(request, 'finance/expenseRecord.html', {
         'categories': categories,

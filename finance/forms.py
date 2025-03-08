@@ -26,7 +26,7 @@ class IncomeForm(forms.ModelForm):
         self.fields['category'].queryset = IncomeCategory.objects.all()
 
         if user and user.currency:
-            self.fields['amount'].label = f"Amount ({user.currency})"
+            self.fields['amount'].label = f"Amount"
 
         # 添加一個選擇貨幣的下拉選單，但不是模型字段
         if exchange_rates and 'rates' in exchange_rates:
@@ -60,7 +60,7 @@ class ExpenseForm(forms.ModelForm):
 
         # Update the amount label with the user's currency
         if user and user.currency:
-            self.fields['amount'].label = f"Amount ({user.currency})"
+            self.fields['amount'].label = f"Amount"
 
         # Populate the currency field with the exchange rates
         if exchange_rates and 'rates' in exchange_rates:

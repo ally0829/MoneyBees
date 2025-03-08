@@ -49,7 +49,7 @@
                     <tr>
                         <td>{{ expense.category }}</td>
                         <td>{{ expense.date }}</td>
-                        <td> {{ user.currency.currency }} {{ expense.amount }} </td>
+                        <td> {{ expense.currency }} {{ expense.amount }} </td>
                         <td>{{ expense.description }}</td>
                         <td>
                             <a href="{% url 'finance:edit_expense' expense.id %}" class="edit-btn">EDIT</a>
