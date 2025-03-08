@@ -183,17 +183,31 @@ def faq_view(request):
 
 
 def add_income(request):
-    # Fetch exchange rates using the utility function
     exchange_rates = fetch_exchange_rates()
 
     if request.method == 'POST':
+        print("POST data:", request.POST)
+
         income_form = IncomeForm(request.POST, initial={
                                  'user': request.user}, exchange_rates=exchange_rates)
         if income_form.is_valid():
             income = income_form.save(commit=False)
             income.user = request.user
+
+            currency_code = request.POST.get('currency_display')
+
+            try:
+                currency, created = Currency.objects.get_or_create(
+                    currency=currency_code)
+                income.currency = currency
+            except Exception as e:
+                print(f"Currency error: {e}")
+                income.currency = request.user.currency
+
             income.save()
             return redirect('finance:add_income')
+        else:
+            print("Form errors:", income_form.errors)
     else:
         income_form = IncomeForm(
             initial={'user': request.user}, exchange_rates=exchange_rates)
@@ -642,4 +656,58 @@ def get_current_user(request):
     return JsonResponse({
         "user_id": request.user.id,
         "username": getattr(request.user, "username", request.user.email)
+    })
+
+
+@login_required
+def yearly_summary(request):
+    """
+    Returns monthly income and expense summaries for the current year
+    """
+    user = request.user
+    today = now().date()
+    current_year = today.year
+
+    # Initialize result data structure
+    monthly_data = []
+    for month in range(1, 13):
+        monthly_data.append({
+            "month": month,
+            # Month abbreviation (Jan, Feb, etc.)
+            "month_name": datetime(current_year, month, 1).strftime('%b'),
+            "income": 0,
+            "expenses": 0
+        })
+
+    # Get income data for each month in current year
+    incomes = Income.objects.filter(
+        user=user,
+        date__year=current_year
+    ).values('date__month').annotate(total=Sum('amount'))
+
+    # Populate income data
+    for income in incomes:
+        month_idx = income['date__month'] - 1  # Convert to 0-based index
+        monthly_data[month_idx]['income'] = float(income['total'])
+
+    # Get expense data for each month in current year
+    expenses = Expense.objects.filter(
+        user=user,
+        date__year=current_year
+    ).values('date__month').annotate(total=Sum('amount'))
+
+    # Populate expense data
+    for expense in expenses:
+        month_idx = expense['date__month'] - 1  # Convert to 0-based index
+        monthly_data[month_idx]['expenses'] = float(expense['total'])
+
+    # Calculate yearly totals
+    yearly_totals = {
+        "total_income": sum(item['income'] for item in monthly_data),
+        "total_expenses": sum(item['expenses'] for item in monthly_data)
+    }
+
+    return JsonResponse({
+        "monthly_data": monthly_data,
+        "yearly_totals": yearly_totals
     })

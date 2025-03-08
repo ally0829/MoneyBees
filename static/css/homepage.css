@@ -42,6 +42,7 @@ body {
   overflow-y: auto;
 }
 
+
 .upcoming-payments {
   background: black;
   color: white;
@@ -319,6 +320,26 @@ body {
   align-items: center;
   width: 100%;
   margin-bottom: 10px;
+}
+
+.monthly-summary-container {
+  margin-top: 30px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.monthly-summary-container h3 {
+  margin-bottom: 15px;
+}
+
+.bar-chart-container {
+  width: 100%;
+  height: 250px;
+  /* Increased height for better visualization */
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  box-sizing: border-box;
 }
 
 h2,

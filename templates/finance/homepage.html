@@ -13,9 +13,10 @@
     <div class="home">
         <section class="spending">
             <div class="actionbtn-container">
-                <h2>Spending (current month)</h2>
+                <h2>Monthly Spending Analysis</h2>
                 <button class="action-btn" onclick="location.href='/finance/expense-record'">View more</button>
             </div>
+            
 
             <div id="dateDisplay"></div> <!-- Display current date -->
             <!--<div>Total Spent: <span id="totalSpent">$0.00</span></div>-->
@@ -30,6 +31,15 @@
                 <!-- Right: Category List -->
                 <div class="category-info" id="categoryInfo">
                     <!-- JavaScript will populate this -->
+                </div>
+
+                <div class="monthly-summary-container">
+                    <div class="header-container">
+                        <h3>Yearly Summary</h3>
+                    </div>
+                    <div class="bar-chart-container">
+                        <canvas id="yearlySummaryChart"></canvas>
+                    </div>
                 </div>
             </div>
         </section>
