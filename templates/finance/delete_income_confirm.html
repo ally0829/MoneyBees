@@ -1,0 +1,31 @@
+{% extends "finance/sidebar.html" %}
+
+{% block title %}Delete Income{% endblock %}
+
+{% block main %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Delete Income</h2>
+        </div>
+        <div class="card-body">
+            <p>Are you sure you want to delete this income?</p>
+
+            <div class="expense-details mb-4">
+                <p><strong>Category:</strong> {{ income.category }}</p>
+                <p><strong>Date:</strong> {{ income.date }}</p>
+                <p><strong>Amount:</strong> {{ income.amount }}</p>
+                <p><strong>Description:</strong> {{ income.description }}</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="button-group">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <a href="{% url 'finance:income_record' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

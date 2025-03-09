@@ -4,37 +4,47 @@
 <!-- Load static files -->
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/income_expense_input.css' %}">
-
 {{ block.super }}
 {% endblock %}
 
 {% block main %}
 <div class="form_container">
   <div class="add_income_expense">
+
     {% if type == "income" %}
-    <h2>Add Income</h2>
-    <form method="post" action="{% url 'finance:add_income' %}">
+      {% if is_edit %}
+        <h2>Edit Income</h2>
+        <form method="post" action="{% url 'finance:edit_income' income_id %}">
+      {% else %}
+        <h2>Add Income</h2>
+        <form method="post" action="{% url 'finance:add_income' %}">
+      {% endif %}
       {% csrf_token %}
       {{ form.as_p }}
-      <button type="submit" class="btn btn-primary">Add Income</button>
-    </form>
-    {% else %}
-    {% if is_edit %}
-    <h2>Edit Expense</h2>
-    <form method="post" action="{% url 'finance:edit_expense' expense_id %}">
+      {% if is_edit %}
+        <button type="submit" class="btn btn-primary">Update Income</button>
       {% else %}
-      <h2>Add Expense</h2>
-      <form method="post" action="{% url 'finance:add_expense' %}">
-        {% endif %}
-        {% csrf_token %}
-        {{ form.as_p }}
-        {% if is_edit %}
-        <button type="submit" class="btn btn-primary">Update Expense</button>
-        {% else %}
-        <button type="submit" class="btn btn-primary">Add Expense</button>
-        {% endif %}
-      </form>
+        <button type="submit" class="btn btn-primary">Add Income</button>
       {% endif %}
+      </form>
+
+    {% else %}
+      {% if is_edit %}
+        <h2>Edit Expense</h2>
+        <form method="post" action="{% url 'finance:edit_expense' expense_id %}">
+      {% else %}
+        <h2>Add Expense</h2>
+        <form method="post" action="{% url 'finance:add_expense' %}">
+      {% endif %}
+      {% csrf_token %}
+      {{ form.as_p }}
+      {% if is_edit %}
+        <button type="submit" class="btn btn-primary">Update Expense</button>
+      {% else %}
+        <button type="submit" class="btn btn-primary">Add Expense</button>
+      {% endif %}
+      </form>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
