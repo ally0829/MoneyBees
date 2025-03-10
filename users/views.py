@@ -2,12 +2,21 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout, get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import SignUpForm
+<<<<<<< HEAD
 from allauth.socialaccount.providers.google.views import OAuth2LoginView
+=======
+# from allauth.socialaccount.providers.google.views import OAuth2LoginView
+>>>>>>> 10032025
 from django.urls import reverse
 from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth import login
 from django.http import HttpResponse
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 10032025
 User = get_user_model()
 
 
