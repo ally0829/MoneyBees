@@ -29,9 +29,13 @@
                 <label for="currency">Currency:</label>
                 <select name="currency" id="currency" required>
                     {% for currency_code, rate in exchange_rates.rates.items %}
-                        <option value="{{ currency_code }}">{{ currency_code }}</option>
+                        <option value="{{ currency_code }}" 
+                            {% if currency_code == user.currency.currency %}selected{% endif %}>
+                            {{ currency_code }}
+                        </option>
                     {% endfor %}
                 </select>
+                
                 
 
                 <label for="amount">Amount</label>

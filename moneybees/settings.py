@@ -212,7 +212,8 @@ SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': ['profile', 'email'],
         # 'AUTH_PARAMS': {'access_type': 'online'},
-        'AUTH_PARAMS': {'prompt': 'select_account'},
+        'AUTH_PARAMS': {'prompt': 'select_account',
+                        'access_type': 'offline'},
         'OAUTH_PKCE_ENABLED': True,
     }
 }

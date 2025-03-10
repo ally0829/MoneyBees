@@ -144,15 +144,15 @@ def add_income(request):
             income = income_form.save(commit=False)
             income.user = request.user
 
-            currency_code = request.POST.get('currency_display')
+            # currency_code = request.POST.get('currency_display')
 
-            try:
-                currency, created = Currency.objects.get_or_create(
-                    currency=currency_code)
-                income.currency = currency
-            except Exception as e:
-                print(f"Currency error: {e}")
-                income.currency = request.user.currency
+            # try:
+            #     currency, created = Currency.objects.get_or_create(
+            #         currency=currency_code)
+            #     income.currency = currency
+            # except Exception as e:
+            #     print(f"Currency error: {e}")
+            #     income.currency = request.user.currency
 
             income.save()
             return redirect('finance:add_income')

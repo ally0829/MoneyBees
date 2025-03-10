@@ -1,25 +1,27 @@
 document.addEventListener("DOMContentLoaded", function () {
-
     const today = new Date();
     const formattedDate = today.toLocaleDateString("en-US", { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
     document.getElementById("dateDisplay").textContent = formattedDate;
 
-
+    // Store the currency symbol globally so it can be used across all API calls
+    let globalCurrencySymbol = "$"; // Default currency symbol
     let totalSpentGlobal = 0;
 
+    // First, fetch the spending summary to get the currency symbol
     fetch("/api/spending-summary/")
         .then(response => response.json())
         .then(data => {
             console.log("Spending Summary Data:", data);
 
+            // Store the currency symbol globally
+            globalCurrencySymbol = data.currency_symbol || "$";
             totalSpentGlobal = Number(data.total_spent);
-            const currencySymbol = data.currency_symbol; 
 
             const labels = data.categories.map(category => category.category);
             const amounts = data.categories.map(category => Number(category.amount));
             const colors = ['#FFA500', '#FF4500', '#8A2BE2', '#1E90FF', '#FF1493'];
 
-            document.getElementById("chartCenterText").textContent = `${currencySymbol}${totalSpentGlobal.toLocaleString()}`;
+            document.getElementById("chartCenterText").textContent = `${globalCurrencySymbol}${totalSpentGlobal.toLocaleString()}`;
 
             const categoryInfo = document.getElementById("categoryInfo");
             categoryInfo.innerHTML = "";
@@ -61,28 +63,85 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             // Fetch yearly summary data for the comparison chart
-            fetch("/api/yearly-summary/")
-                .then(response => {
-                    console.log("Yearly API Status:", response.status);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(yearlyData => {
-                    console.log("Yearly Summary Data:", yearlyData);
+            fetchYearlySummary();
 
-                    // Create yearly comparison chart
-                    createYearlySummaryChart(yearlyData.monthly_data);
-                })
-                .catch(error => {
-                    console.error("Error fetching yearly summary:", error);
-                });
+            // Now that we have the currency symbol, fetch other data
+            fetchUpcomingExpenses();
+            fetchExpenseTargets();
         })
-        .catch(error => console.error("Error fetching spending summary:", error));
+        .catch(error => {
+            console.error("Error fetching spending summary:", error);
+            // Even if there's an error, attempt to fetch other data with default symbol
+            fetchYearlySummary();
+            fetchUpcomingExpenses();
+            fetchExpenseTargets();
+        });
 
+    function fetchYearlySummary() {
+        fetch("/api/yearly-summary/")
+            .then(response => {
+                console.log("Yearly API Status:", response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(yearlyData => {
+                console.log("Yearly Summary Data:", yearlyData);
+                // Create yearly comparison chart using the global currency symbol
+                createYearlySummaryChart(yearlyData.monthly_data, globalCurrencySymbol);
+            })
+            .catch(error => {
+                console.error("Error fetching yearly summary:", error);
+            });
+    }
 
-    function createYearlySummaryChart(monthlyData) {
+    function fetchUpcomingExpenses() {
+        fetch("/api/upcoming-expenses/")
+            .then(response => response.json())
+            .then(data => {
+                console.log("Upcoming Payments Data:", data);
+                // Use global currency symbol instead of expecting it in the response
+                const upcomingList = document.getElementById("upcomingPaymentsList");
+                upcomingList.innerHTML = !data.upcoming_expenses || data.upcoming_expenses.length === 0
+                    ? "<p>No upcoming payments</p>"
+                    : data.upcoming_expenses.map(payment => `
+                        <div class="payment-item">
+                            <span>${payment.category}</span> <span>-${payment.currency}${payment.amount} (Due: ${payment.due_date})</span>
+                        </div>
+                    `).join('');
+            })
+            .catch(error => console.error("Error fetching upcoming expenses:", error));
+    }
+
+    function fetchExpenseTargets() {
+        fetch("/api/expense-targets/")
+            .then(response => response.json())
+            .then(data => {
+                console.log("Expense Targets Data:", data);
+                // Use global currency symbol instead of expecting it in the response
+                const targetSection = document.getElementById("expenseTargetList");
+                targetSection.innerHTML = !data.expense_targets || data.expense_targets.length === 0
+                    ? "<p>No expense targets set</p>"
+                    : data.expense_targets.map(target => {
+                        const progressWidth = Math.min((target.current_spent / target.target_amount) * 100, 100);
+                        return `
+                            <div class="target-item">
+                                <div class="target-category">${target.category}</div>
+                                <div class="target-progress-container">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${progressWidth}%;"></div>
+                                    </div>
+                                    <div class="target-amount">${target.currency}${target.current_spent} / ${target.currency}${target.target_amount}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+            })
+            .catch(error => console.error("Error fetching expense targets:", error));
+    }
+
+    function createYearlySummaryChart(monthlyData, currencySymbol) {
         console.log("Creating yearly summary chart with data:", monthlyData);
         const ctx = document.getElementById('yearlySummaryChart').getContext('2d');
 
@@ -125,7 +184,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         ticks: {
                             color: 'rgba(255, 255, 255, 0.7)',
                             callback: function (value) {
-                                return '$' + value.toLocaleString();
+                                return `${currencySymbol} ${value.toLocaleString()}`;
                             }
                         }
                     },
@@ -149,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     tooltip: {
                         callbacks: {
                             label: function (context) {
-                                return context.dataset.label + ': $' + context.raw.toLocaleString();
+                                return `${context.dataset.label}: ${currencySymbol}${context.raw.toLocaleString()}`;
                             }
                         }
                     }
@@ -292,7 +351,6 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => {
                 console.error("Fetch Error:", error);
                 alert("Failed to save expense target.");
-
             });
     });
 

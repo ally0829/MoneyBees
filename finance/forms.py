@@ -4,17 +4,17 @@ from users.models import User
 # import forms
 # from finance.views import fetch_exchange_rates
 from django import forms
+from datetime import date
 
 
 class IncomeForm(forms.ModelForm):
-    # 添加一個隱藏的貨幣字段用於存儲貨幣代碼
     currency_code = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     class Meta:
         model = Income
-        fields = ['date', 'category', 'amount', 'description']  # 移除 currency
+        fields = ['date', 'category', 'amount', 'description']  # Currency is third in order
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'max': date.today().strftime('%Y-%m-%d')}),
             'amount': forms.NumberInput(attrs={'step': '0.01'}),
         }
 
@@ -26,32 +26,34 @@ class IncomeForm(forms.ModelForm):
         self.fields['category'].queryset = IncomeCategory.objects.all()
 
         if user and user.currency:
-            self.fields['amount'].label = f"Amount"
+            self.fields['amount'].label = "Amount"
 
-        # 添加一個選擇貨幣的下拉選單，但不是模型字段
         if exchange_rates and 'rates' in exchange_rates:
             rates = exchange_rates['rates']
-            currency_choices = [(currency, currency)
-                                for currency in rates.keys()]
+            currency_choices = [(currency, currency) for currency in rates.keys()]
+
+            # Adding a new currency field at the third position
             self.fields['currency_display'] = forms.ChoiceField(
                 choices=currency_choices,
                 label="Currency",
-                initial=user.currency.currency if user and user.currency else None
+                initial=user.currency.currency if user and user.currency else 'USD',  # Default to 'USD'
             )
+
+            # Reorder fields to ensure currency is third in display order
+            self.order_fields(['date', 'category', 'currency_display', 'currency', 'amount', 'description'])
 
 
 class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Expense
-        fields = ['date', 'category', 'currency', 'amount', 'description']
+        fields = ['date', 'category', 'amount', 'description']  # Currency remains third in order
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'max': date.today().strftime('%Y-%m-%d')}),
             'amount': forms.NumberInput(attrs={'step': '0.01'}),
         }
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('initial', {}).get('user', None)
-        # Get exchange rates from kwargs
         exchange_rates = kwargs.pop('exchange_rates', {})
         super().__init__(*args, **kwargs)
 
@@ -60,12 +62,19 @@ class ExpenseForm(forms.ModelForm):
 
         # Update the amount label with the user's currency
         if user and user.currency:
-            self.fields['amount'].label = f"Amount"
+            self.fields['amount'].label = "Amount"
 
         # Populate the currency field with the exchange rates
         if exchange_rates and 'rates' in exchange_rates:
-            rates = exchange_rates['rates']  # Access the 'rates' key
-            currency_choices = [(currency, currency)
-                                for currency in rates.keys()]
-            self.fields['currency'].widget = forms.Select(
-                choices=currency_choices)
+            rates = exchange_rates['rates']
+            currency_choices = [(currency, currency) for currency in rates.keys()]
+
+            # Adding a new currency display field
+            self.fields['currency_display'] = forms.ChoiceField(
+                choices=currency_choices,
+                label="Currency",
+                initial=user.currency.currency if user and user.currency else 'USD',  # Default to 'USD'
+            )
+
+            # Reorder fields to ensure currency is third in display order
+            self.order_fields(['date', 'category', 'currency_display', 'currency', 'amount', 'description'])

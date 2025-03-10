@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout, get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import SignUpForm
-from allauth.socialaccount.providers.google.views import OAuth2LoginView
 from django.urls import reverse
 from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth import login
