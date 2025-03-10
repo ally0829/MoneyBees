@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 ? "<p>No upcoming payments</p>"
                 : data.upcoming_expenses.map(payment => `
                     <div class="payment-item">
-                        <span>${payment.category}</span> <span>-$${payment.amount} (Due: ${payment.due_date})</span>
+                        <span>${payment.category}</span> <span>-${payment.currency} ${payment.amount} (Due: ${payment.due_date})</span>
                     </div>
                 `).join('');
         })
@@ -191,7 +191,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 <div class="progress-bar">
                                     <div class="progress-fill" style="width: ${progressWidth}%;"></div>
                                 </div>
-                                <div class="target-amount">$${target.current_spent} / $${target.target_amount}</div>
+                                <div class="target-amount">${target.currency} ${target.current_spent} / $${target.target_amount}</div>
                             </div>
                         </div>
                     `;

@@ -10,6 +10,9 @@ class CustomUserManager(BaseUserManager):
 
         # Normalize the email address
         email = self.normalize_email(email)
+        user = self.model(email=self.normalize_email(email),
+                          firstname=firstname, lastname=lastname)
+
 
         # Create the user
         user = self.model(

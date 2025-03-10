@@ -637,7 +637,8 @@ def upcoming_expenses(request):
         {
             "category": payment.category.name,
             "amount": payment.amount,
-            "due_date": payment.date.strftime("%d %b")
+            "due_date": payment.date.strftime("%d %b"),
+            "currency": payment.currency.currency
         }
         for payment in upcoming_payments
     ]
@@ -672,6 +673,7 @@ def expense_targets(request):
                     "category": target.category.name,
                     "target_amount": float(target.amount),
                     "month": target.month,
+                    
                 })
             else:
                 return JsonResponse({"message": "No target found"}, status=404)
@@ -688,7 +690,8 @@ def expense_targets(request):
                 "category": target.category.name,
                 "target_amount": float(target.amount),
                 "current_spent": float(expense_dict.get(target.category.id, 0)),
-                "progress": round((expense_dict.get(target.category.id, 0) / target.amount) * 100, 2) if target.amount > 0 else 0
+                "progress": round((expense_dict.get(target.category.id, 0) / target.amount) * 100, 2) if target.amount > 0 else 0,
+                "currency": user.currency.currency
             }
             for target in targets
         ]

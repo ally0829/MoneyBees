@@ -49,7 +49,7 @@
                     <tr>
                         <td>{{ income.category }}</td>
                         <td>{{ income.date }}</td>
-                        <td> {{ user.currency.currency }} {{ income.amount }} </td>
+                        <td> {{ income.currency }} {{ income.amount }} </td>
                         <td>{{ income.description }}</td>
                         <td>
                             <a href="{% url 'finance:edit_income' income.id %}" class="edit-btn">EDIT</a>
