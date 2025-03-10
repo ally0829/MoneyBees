@@ -47,7 +47,7 @@ SECRET_KEY = "django-insecure-2z=$73p3gi!_!6z#)$bq)*8k%(i2(#^+%ghx)vj@lgt!&a5+b%
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-EXCHANGE_RATE_API_KEY = "69d2a94295fa20b4e723db93e342c8b3"
+EXCHANGE_RATE_API_KEY = "8b78839b1ef3e77ab5dbb731da4bd646"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

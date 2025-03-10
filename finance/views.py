@@ -20,6 +20,7 @@ from django.utils.timezone import now
 import logging
 from django.shortcuts import render, redirect
 from django.contrib import messages
+
 logger = logging.getLogger(__name__)
 # Create your views here.
 # views.py
@@ -28,24 +29,50 @@ logger = logging.getLogger(__name__)
 from decimal import Decimal, ROUND_HALF_UP
 from django.db.models import Sum
 
-def fetch_historic_exchange_rate(date, base_currency, target_currency):
+def fetch_exchange_rate(date, base_currency, target_currency):
     """
-    Fetch the historic exchange rate for a specific date.
+    Fetch the exchange rate for a specific date.
+    Always uses EUR as the base currency.
     """
+    print(f"Base Currency: {base_currency}, Date: {date}, Target Currency: {target_currency}")
+
+    # Check if the date is in the future
+    if datetime.strptime(date, "%Y-%m-%d").date() > datetime.now().date():
+        logger.warning(f"Future date {date} is not supported. Using latest exchange rate.")
+        date = "latest"  # Use the latest exchange rate for future dates
+
     api_key = settings.EXCHANGE_RATE_API_KEY
-    url = f"http://api.exchangeratesapi.io/v1/{date}?access_key={api_key}"
+    url = f"https://api.exchangeratesapi.io/v1/{date}?access_key={api_key}&base=EUR&symbols={base_currency},{target_currency}"
+
+    print(f"API URL: {url}")
 
     try:
         response = requests.get(url)
         response.raise_for_status()  # Raise an exception for HTTP errors
         data = response.json()
 
-        data = data.get("rates", {}).get(target_currency)
+        print(f"API Response: {data}")
 
-        return data
+        if not data.get("success", False):
+            error_message = data.get("error", {}).get("info", "Unknown error")
+            logger.error(f"API error: {error_message}")
+            return None
+
+        # Extract the exchange rates
+        rates = data.get("rates", {})
+        base_rate = rates.get(base_currency)
+        target_rate = rates.get(target_currency)
+
+        if not base_rate or not target_rate:
+            logger.error(f"Exchange rates not found for {base_currency} or {target_currency} on {date}.")
+            return None
+
+        # Calculate the exchange rate from base_currency to target_currency
+        exchange_rate = target_rate / base_rate
+        return Decimal(str(exchange_rate))
     except requests.exceptions.RequestException as e:
         logger.error(f"Failed to fetch exchange rates: {e}")
-        return {}  # Return an empty dictionary in case of failure
+        return None
 
 
 def convert_to_default_currency(amount, expense_currency, default_currency, transaction_date):
@@ -57,18 +84,18 @@ def convert_to_default_currency(amount, expense_currency, default_currency, tran
         # No conversion needed
         return Decimal(amount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
-    # Fetch the historic exchange rate
-    exchange_rate = fetch_historic_exchange_rate(
-        date=transaction_date,
-        base_currency=default_currency,
-        target_currency=expense_currency
+    # Fetch the exchange rate from expense_currency to default_currency
+    exchange_rate = fetch_exchange_rate(
+        date=transaction_date.strftime("%Y-%m-%d"),  # Format date as YYYY-MM-DD
+        base_currency=expense_currency,
+        target_currency=default_currency
     )
 
     if not exchange_rate:
-        raise ValueError(f"Exchange rate not found for {expense_currency} on {transaction_date}.")
+        raise ValueError(f"Exchange rate not found for {expense_currency} to {default_currency} on {transaction_date}.")
 
     # Convert the amount to the default currency
-    converted_amount = Decimal(amount) / Decimal(exchange_rate)
+    converted_amount = Decimal(amount) * exchange_rate
     return converted_amount.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
 def calculate_total_amount(user, expenses):
@@ -77,11 +104,11 @@ def calculate_total_amount(user, expenses):
     using historic exchange rates.
     """
     default_currency = user.currency.currency
-    # total_amount = Decimal(0)
-    total_amount = 0
+    total_amount = Decimal(0)
+
     for expense in expenses:
         if not expense.currency:
-            logger.error(f"Expense {expense.id} has no currency assigned.")
+            logger.warning(f"Expense {expense.id} has no currency assigned.")
             continue  # Skip this expense or handle it appropriately
 
         # Convert each expense amount to the default currency
@@ -89,10 +116,9 @@ def calculate_total_amount(user, expenses):
             amount=expense.amount,
             expense_currency=expense.currency.currency,  # Access currency code
             default_currency=default_currency,
-            transaction_date=expense.date # Format date as YYYY-MM-DD
+            transaction_date=expense.date  # Format date as YYYY-MM-DD
         )
         total_amount += converted_amount
-
 
     return total_amount
 
@@ -533,6 +559,8 @@ def income_record_view(request):
     categories = IncomeCategory.objects.all()
     incomes = Income.objects.all()
 
+    total_amount = calculate_total_amount(user, incomes)
+
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     category = request.GET.get('category')
@@ -554,8 +582,6 @@ def income_record_view(request):
     if category and category != "ALL":
         incomes = incomes.filter(category__name=category)
 
-    total_amount = incomes.aggregate(
-        Sum('amount'))['amount__sum'] * user.currency.rate or 0
 
     return render(request, 'finance/incomeRecord.html', {
         'categories': categories,

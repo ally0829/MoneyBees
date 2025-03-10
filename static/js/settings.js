@@ -118,3 +118,9 @@ function checkFormChanges() {
 
     // Initial check in case the form is pre-filled with changes
     checkFormChanges();
+
+    // $(document).ready(function() {
+    //     $('#deleteAccountBtn').click(function() {
+    //         alert("Button clicked!"); // Test if the click event works
+    //     });
+    // });
