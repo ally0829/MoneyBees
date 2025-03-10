@@ -1,151 +1,27 @@
-from .models import ExchangeRate
-from django.shortcuts import render
-from users.models import Currency
-import requests
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import update_session_auth_hash
-from users.models import User
-from django.shortcuts import redirect, render, get_object_or_404
-import json
-from django.conf import settings
-from finance.forms import IncomeForm, ExpenseForm
-from finance.models import Income, Expense, ExpenseCategory, MonthlyExpenseTarget, IncomeCategory, UpcomingPayment
-from django.db.models import Sum
-from datetime import datetime
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
-from django.http import HttpResponse
-from django.utils.timezone import now
-import logging
-from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.core.mail import send_mail
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.timezone import now
+from django.db.models import Sum
+from django.db import models
+from decimal import Decimal
+from datetime import datetime
+import json
+import logging
+
+from users.models import User, Currency
+from finance.forms import IncomeForm, ExpenseForm
+from finance.models import (
+    Income, Expense, ExpenseCategory, MonthlyExpenseTarget,
+    IncomeCategory, UpcomingPayment
+)
+from .services import convert_to_default_currency, calculate_total_amount, fetch_exchange_rates
 
 logger = logging.getLogger(__name__)
-# Create your views here.
-# views.py
-# Set up logging
-# logger = logging.getLogger(__name__)
-from decimal import Decimal, ROUND_HALF_UP
-from django.db.models import Sum
-
-def fetch_exchange_rate(date, base_currency, target_currency):
-    """
-    Fetch the exchange rate for a specific date.
-    Always uses EUR as the base currency.
-    """
-    print(f"Base Currency: {base_currency}, Date: {date}, Target Currency: {target_currency}")
-
-    # Check if the date is in the future
-    if datetime.strptime(date, "%Y-%m-%d").date() > datetime.now().date():
-        logger.warning(f"Future date {date} is not supported. Using latest exchange rate.")
-        date = "latest"  # Use the latest exchange rate for future dates
-
-    api_key = settings.EXCHANGE_RATE_API_KEY
-    url = f"https://api.exchangeratesapi.io/v1/{date}?access_key={api_key}&base=EUR&symbols={base_currency},{target_currency}"
-
-    print(f"API URL: {url}")
-
-    try:
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an exception for HTTP errors
-        data = response.json()
-
-        print(f"API Response: {data}")
-
-        if not data.get("success", False):
-            error_message = data.get("error", {}).get("info", "Unknown error")
-            logger.error(f"API error: {error_message}")
-            return None
-
-        # Extract the exchange rates
-        rates = data.get("rates", {})
-        base_rate = rates.get(base_currency)
-        target_rate = rates.get(target_currency)
-
-        if not base_rate or not target_rate:
-            logger.error(f"Exchange rates not found for {base_currency} or {target_currency} on {date}.")
-            return None
-
-        # Calculate the exchange rate from base_currency to target_currency
-        exchange_rate = target_rate / base_rate
-        return Decimal(str(exchange_rate))
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Failed to fetch exchange rates: {e}")
-        return None
-
-
-def convert_to_default_currency(amount, expense_currency, default_currency, transaction_date):
-    """
-    Convert the given amount from expense_currency to default_currency
-    using the historic exchange rate for the transaction date.
-    """
-    if expense_currency == default_currency:
-        # No conversion needed
-        return Decimal(amount).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-
-    # Fetch the exchange rate from expense_currency to default_currency
-    exchange_rate = fetch_exchange_rate(
-        date=transaction_date.strftime("%Y-%m-%d"),  # Format date as YYYY-MM-DD
-        base_currency=expense_currency,
-        target_currency=default_currency
-    )
-
-    if not exchange_rate:
-        raise ValueError(f"Exchange rate not found for {expense_currency} to {default_currency} on {transaction_date}.")
-
-    # Convert the amount to the default currency
-    converted_amount = Decimal(amount) * exchange_rate
-    return converted_amount.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-
-def calculate_total_amount(user, expenses):
-    """
-    Calculate the total amount of expenses in the user's default currency
-    using historic exchange rates.
-    """
-    default_currency = user.currency.currency
-    total_amount = Decimal(0)
-
-    for expense in expenses:
-        if not expense.currency:
-            logger.warning(f"Expense {expense.id} has no currency assigned.")
-            continue  # Skip this expense or handle it appropriately
-
-        # Convert each expense amount to the default currency
-        converted_amount = convert_to_default_currency(
-            amount=expense.amount,
-            expense_currency=expense.currency.currency,  # Access currency code
-            default_currency=default_currency,
-            transaction_date=expense.date  # Format date as YYYY-MM-DD
-        )
-        total_amount += converted_amount
-
-    return total_amount
-
-def fetch_exchange_rates():
-    """
-    Fetches the latest exchange rates from the API.
-    Returns a dictionary containing the exchange rates and metadata.
-    """
-    api_key = settings.EXCHANGE_RATE_API_KEY
-    url = f"http://api.exchangeratesapi.io/v1/latest?access_key={api_key}"
-
-    try:
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an exception for HTTP errors
-        data = response.json()
-
-        return {
-            "success": data.get("success"),
-            "timestamp": data.get("timestamp"),
-            "base": data.get("base"),
-            "date": data.get("date"),
-            "rates": data.get("rates"),
-        }
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Failed to fetch exchange rates: {e}")
-        return {}  # Return an empty dictionary in case of failure
-
 
 @csrf_exempt
 def toggle_notifications(request):
@@ -160,38 +36,6 @@ def toggle_notifications(request):
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
     return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
-
-
-def get_exchange_rate(request):
-    # Your API key (store it in settings.py for security)
-    api_key = settings.EXCHANGE_RATE_API_KEY
-    url = f"http://api.exchangeratesapi.io/v1/latest?access_key={api_key}"
-
-    # Make the API request
-    # Make the API request
-    response = requests.get(url)
-    # convert json to object
-    response = response.json()
-    print(response)
-    items = response["Items"]
-    print(items)
-
-    json_itmes = []
-
-    for item in items:
-        currency = item["Item"]
-        json_itmes.append({
-            "success": currency["success"],
-            "timestamp": currency["timestamp"],
-            "base": currency["base"],
-            "date": currency["date"],
-            "rates": currency["rates"]
-        })
-
-    json_items = json.dump(json_items)
-
-    return JsonResponse({"items": json_items}, status=200)
-
 
 @login_required
 def home_view(request):
@@ -364,25 +208,7 @@ def add_expense(request):
 
 
 def edit_expense(request, expense_id):
-    api_key = settings.EXCHANGE_RATE_API_KEY
-    url = f"http://api.exchangeratesapi.io/v1/latest?access_key={api_key}"
-    # Make the API request
-    response = requests.get(url)
-    data = response.json()  # Convert JSON response to Python dictionary
-
-    user = request.user
-
-    if response.status_code == 200:
-        # Extract relevant data
-        exchange_rates = {
-            "success": data.get("success"),
-            "timestamp": data.get("timestamp"),
-            "base": data.get("base"),
-            "date": data.get("date"),
-            "rates": data.get("rates"),
-        }
-    else:
-        exchange_rates = {}  # Fallback in case of API failure
+    exchange_rates = fetch_exchange_rates()
 
     # Get the expense instance that we want to edit
     expense = get_object_or_404(Expense, id=expense_id)
@@ -420,25 +246,7 @@ def edit_expense(request, expense_id):
 
 
 def edit_income(request, income_id):
-    api_key = settings.EXCHANGE_RATE_API_KEY
-    url = f"http://api.exchangeratesapi.io/v1/latest?access_key={api_key}"
-    # Make the API request
-    response = requests.get(url)
-    data = response.json()  # Convert JSON response to Python dictionary
-
-    user = request.user
-
-    if response.status_code == 200:
-        # Extract relevant data
-        exchange_rates = {
-            "success": data.get("success"),
-            "timestamp": data.get("timestamp"),
-            "base": data.get("base"),
-            "date": data.get("date"),
-            "rates": data.get("rates"),
-        }
-    else:
-        exchange_rates = {}  # Fallback in case of API failure
+    exchange_rates = fetch_exchange_rates()
 
     # Get the expense instance that we want to edit
     income = get_object_or_404(Income, id=income_id)
@@ -513,8 +321,6 @@ def expense_record_view(request):
     user = request.user
 
     # Ensure user has a valid currency
-
-
     categories = ExpenseCategory.objects.all()
     expenses = Expense.objects.filter(user=user)
     # expenses = Expense.objects.filter(user=user)
@@ -750,16 +556,6 @@ def test_email(request):
         return HttpResponse(f"Error sending email: {str(e)}")
 # API: return the percentage of the expense per month in the home page
 
-
-from django.db.models import Sum
-from decimal import Decimal, ROUND_HALF_UP
-from datetime import datetime
-from django.http import JsonResponse
-from django.utils.timezone import now
-import logging
-
-logger = logging.getLogger(__name__)
-
 @login_required
 def spending_summary(request):
     user = request.user
@@ -977,14 +773,7 @@ def get_current_user(request):
     })
 
 
-from django.db.models import Sum
-from decimal import Decimal, ROUND_HALF_UP
-from datetime import datetime
-from django.http import JsonResponse
-from django.utils.timezone import now
-import logging
 
-logger = logging.getLogger(__name__)
 
 @login_required
 def yearly_summary(request):
