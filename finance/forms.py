@@ -4,10 +4,7 @@ from users.models import User
 # import forms
 # from finance.views import fetch_exchange_rates
 from django import forms
-<<<<<<< HEAD
-=======
 from datetime import date 
->>>>>>> 10032025
 
 
 class IncomeForm(forms.ModelForm):
@@ -16,17 +13,11 @@ class IncomeForm(forms.ModelForm):
 
     class Meta:
         model = Income
-<<<<<<< HEAD
-        fields = ['date', 'category', 'amount', 'description']  # 移除 currency
-        widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
-=======
     
         fields = ['date', 'category', 'amount', 'description']  # 移除 currency
         widgets = {
             # 'date': forms.DateInput(attrs={'type': 'date'}),
             'date': forms.DateInput(attrs={'type': 'date', 'max': date.today().strftime('%Y-%m-%d')}),
->>>>>>> 10032025
             'amount': forms.NumberInput(attrs={'step': '0.01'}),
         }
 
@@ -57,11 +48,7 @@ class ExpenseForm(forms.ModelForm):
         model = Expense
         fields = ['date', 'category', 'currency', 'amount', 'description']
         widgets = {
-<<<<<<< HEAD
-            'date': forms.DateInput(attrs={'type': 'date'}),
-=======
             'date': forms.DateInput(attrs={'type': 'date', 'max': date.today().strftime('%Y-%m-%d')}),
->>>>>>> 10032025
             'amount': forms.NumberInput(attrs={'step': '0.01'}),
         }
 

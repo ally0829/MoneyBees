@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-from django.test import TestCase
-
-# Create your tests here.
-=======
 from django.test import TestCase, Client
 
 # Create your tests here.
@@ -86,4 +81,3 @@ class FinanceModelsTestCase(TestCase):
         self.assertEqual(MonthlyExpenseTarget.objects.count(), 1)
         self.assertEqual(self.monthly_target.amount, 300.00)
         self.assertEqual(self.monthly_target.month, 3)
->>>>>>> 10032025
