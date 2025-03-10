@@ -58,7 +58,7 @@ html {
     font-weight: bold;
 }
 
-/* Smart Tracking, Sweet Saving 樣式 */
+/* Smart Tracking, Sweet Saving  */
 .tagline {
     font-family: 'Agbalumo', sans-serif !important;
     font-size: 30px;
@@ -68,7 +68,7 @@ html {
     margin-top: 10px;
 }
 
-/* Login 標題 */
+/* Login  */
 h2 {
     /* font-family: 'Inter', sans-serif; */
     font-size: 60px;
@@ -78,7 +78,7 @@ h2 {
     margin-bottom: 20px;
 }
 
-/* 調整表單寬度 */
+
 form {
     width: 90%;
     max-width: 400px;
@@ -93,7 +93,7 @@ label {
     text-align: left;
 }
 
-/* 修正輸入框背景顏色 */
+
 .input-group {
     display: flex;
     align-items: center;
@@ -120,7 +120,7 @@ label {
     color: black;
 }
 
-/* Sign in 按鈕 */
+/* Sign in  */
 .btn-primary {
     background-color: #FFDC00;
     color: black;
@@ -139,14 +139,7 @@ label {
     background-color: #F0B900;
 }
 
-/* Google 登入按鈕
-.btn-google {
-    display: none !important;
-}
 
-.btn-google img {
-    display: none !important;
-} */
 
 .separator {
     text-align: center;
@@ -155,7 +148,7 @@ label {
     font-weight: bold;
 }
 
-/* 修正 Forgot Password 連結顏色 */
+
 .forgot-password {
     display: block;
     text-align: center;
@@ -178,7 +171,7 @@ label {
 .signup-text a,
 .signup-text a:visited {
     color: #FFDC00 !important;
-    /* 強制設為黃色 */
+
     font-weight: bold;
     text-decoration: none;
 
@@ -191,17 +184,17 @@ label {
 .forgot-password {
     display: block;
     text-align: right;
-    /* 確保文字置中 */
+
     margin-top: 20px;
-    /* 增加與上方間距 */
+
     margin-right: 20px;
     font-size: 14px;
     color: #A0A0A0 !important;
     text-decoration: none;
     position: relative;
-    /* 避免跑到底部 */
+
     width: 100%;
-    /* 確保它不會縮小 */
+
 }
 
 .forgot-password:hover {
@@ -209,7 +202,8 @@ label {
 }
 
 .btn-google {
-    background-color: #4285F4; /* Google's Blue */
+    background-color: #4285F4;
+    /* Google's Blue */
     color: white;
     font-size: 16px;
     font-weight: bold;
@@ -226,7 +220,8 @@ label {
 }
 
 .btn-google:hover {
-    background-color: #357ae8; /* Darker Blue on Hover */
+    background-color: #357ae8;
+    /* Darker Blue on Hover */
 }
 
 .btn-google img {

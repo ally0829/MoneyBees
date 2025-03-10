@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("Spending Summary Data:", data);
 
             totalSpentGlobal = Number(data.total_spent);
-            const currencySymbol = data.currency_symbol; 
+            const currencySymbol = data.currency_symbol;
 
             const labels = data.categories.map(category => category.category);
             const amounts = data.categories.map(category => Number(category.amount));
@@ -70,10 +70,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     return response.json();
                 })
                 .then(yearlyData => {
-                    console.log("Yearly Summary Data:", yearlyData);
+                    console.log("Yearly Summary Data:", yearlyData, currencySymbol);
 
                     // Create yearly comparison chart
-                    createYearlySummaryChart(yearlyData.monthly_data);
+                    createYearlySummaryChart(yearlyData.monthly_data, currencySymbol);
                 })
                 .catch(error => {
                     console.error("Error fetching yearly summary:", error);
@@ -82,7 +82,8 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error fetching spending summary:", error));
 
 
-    function createYearlySummaryChart(monthlyData) {
+
+    function createYearlySummaryChart(monthlyData, currencySymbol) {
         console.log("Creating yearly summary chart with data:", monthlyData);
         const ctx = document.getElementById('yearlySummaryChart').getContext('2d');
 
@@ -125,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         ticks: {
                             color: 'rgba(255, 255, 255, 0.7)',
                             callback: function (value) {
-                                return '$' + value.toLocaleString();
+                                return `${currencySymbol} ${value.toLocaleString()}`;
                             }
                         }
                     },
@@ -149,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     tooltip: {
                         callbacks: {
                             label: function (context) {
-                                return context.dataset.label + ': $' + context.raw.toLocaleString();
+                                return `${context.dataset.label}: ${currencySymbol}${context.raw.toLocaleString()}`;
                             }
                         }
                     }

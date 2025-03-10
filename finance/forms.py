@@ -4,17 +4,16 @@ from users.models import User
 # import forms
 # from finance.views import fetch_exchange_rates
 from django import forms
-from datetime import date 
+from datetime import date
 
 
 class IncomeForm(forms.ModelForm):
-    # 添加一個隱藏的貨幣字段用於存儲貨幣代碼
     currency_code = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     class Meta:
         model = Income
-    
-        fields = ['date', 'category', 'amount', 'description']  # 移除 currency
+
+        fields = ['date', 'category', 'amount', 'description']
         widgets = {
             # 'date': forms.DateInput(attrs={'type': 'date'}),
             'date': forms.DateInput(attrs={'type': 'date', 'max': date.today().strftime('%Y-%m-%d')}),
@@ -31,7 +30,6 @@ class IncomeForm(forms.ModelForm):
         if user and user.currency:
             self.fields['amount'].label = f"Amount"
 
-        # 添加一個選擇貨幣的下拉選單，但不是模型字段
         if exchange_rates and 'rates' in exchange_rates:
             rates = exchange_rates['rates']
             currency_choices = [(currency, currency)
