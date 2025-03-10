@@ -8,8 +8,6 @@ from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth import login
 from django.http import HttpResponse
 
-
-
 User = get_user_model()
 
 

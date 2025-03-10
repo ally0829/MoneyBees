@@ -4,7 +4,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from datetime import datetime
 import logging
 from django.conf import settings
-
+logger = logging.getLogger(__name__)
 
 def fetch_historic_exchange_rate(date, base_currency, target_currency):
     """
