@@ -1,0 +1,114 @@
+{% extends "finance/sidebar.html" %}
+{% load static %}
+
+{% block style %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block main %}
+<div class="content-wrapper">
+    <div class="home">
+        <section class="spending">
+            <div class="actionbtn-container">
+                <h2>Monthly Spending Analysis</h2>
+                <button class="action-btn" onclick="location.href='/finance/expense-record'">View more</button>
+            </div>
+            
+
+            <div id="dateDisplay"></div> <!-- Display current date -->
+            <!--<div>Total Spent: <span id="totalSpent">$0.00</span></div>-->
+
+            <div class="chart-info-container">
+                <!-- Left: Pie Chart -->
+                <div class="chart-container">
+                    <canvas id="spendingChart"></canvas>
+                    <div class="chart-center-text" id="chartCenterText">$0</div>
+                </div>
+
+                <!-- Right: Category List -->
+                <div class="category-info" id="categoryInfo">
+                    <!-- JavaScript will populate this -->
+                </div>
+
+                <div class="monthly-summary-container">
+                    <div class="header-container">
+                        <h3>Yearly Summary</h3>
+                    </div>
+                    <div class="bar-chart-container">
+                        <canvas id="yearlySummaryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="upcoming-payments">
+            <div class="header-container">
+                <h3>Upcoming Payments</h3>
+                <button class="action-btn" onclick="location.href='/finance/upcomingExpense'">See All</button>
+            </div>
+            <div class="payment-list" id="upcomingPaymentsList">
+                <!-- JavaScript will populate this -->
+            </div>
+        </section>
+
+        <section class="expense-target">
+            <h3>
+                Monthly Expense Target
+                <button class="action-btn edit-btn" data-bs-toggle="modal"
+                    data-bs-target="#editExpenseTargetModal">Edit</button>
+            </h3>
+            <div class="target-list" id="expenseTargetList">
+                <!-- JavaScript will populate this -->
+            </div>
+        </section>
+    </div>
+    <!-- Monthly Expense Target Modal -->
+    <div class="modal fade" id="editExpenseTargetModal" tabindex="-1" aria-labelledby="editExpenseTargetLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editExpenseTargetLabel">Edit Monthly Expense Target</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="expenseTargetForm">
+                        <div class="mb-3">
+                            <label for="userSelect" class="form-label">User</label>
+                            <select class="form-control" id="userSelect"></select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categorySelect" class="form-label">Category</label>
+                            <select class="form-control" id="categorySelect"></select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="amountInput" class="form-label">Amount</label>
+                            <input type="number" class="form-control" id="amountInput" min="0" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label for="monthInput" class="form-label">Month</label>
+                            <input type="month" class="form-control" id="monthInput" readonly>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveExpenseTarget">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% block script %}
+{% load static %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/homepage.js' %}"></script>
+{% endblock %}
+
+{% endblock %}

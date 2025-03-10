@@ -1,0 +1,50 @@
+.topbar {
+    display: grid;
+    grid-template-columns: 40% 20% 40%;
+    grid-template-rows: 1fr 1fr;
+    place-items: center;
+}
+
+.mb-logo {
+    font-family: 'Bagel Fat One', cursive; 
+    font-size: 3rem; 
+    color: #000;
+}
+
+.font1{
+    font-family: "EB Garamond", serif;
+    font-optical-sizing: auto;
+    font-weight: bold;
+    font-style: italic;
+    font-size: 30px;
+  }
+
+  .topbar-icon-container{
+    display: flex;
+    font-weight: bold;
+    font-size: 24px;
+  }
+
+  .topbar-icon {
+    display: flex;
+    padding: 1rem;
+    align-items: anchor-center;
+  }
+
+  .topbar-icon svg {
+    background-color: #E9DC5A;
+    padding: 4px;
+    border-radius: 12px;
+  }
+  
+
+.user-info a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 15px;
+}
+
+.nav-link{
+  text-decoration: none;
+  color: black;
+}

@@ -1,0 +1,197 @@
+.settings {
+    display: grid;
+    grid-template-columns: 75% 25%;
+    grid-template-rows: 75% 25%;
+    margin-left: 8%;
+}
+
+#settings-form{
+    grid-row: 1, span 3;
+    /* display: grid; */
+    /* grid-template-columns: 75%; */
+    grid-template-rows: repeat(6, 20%);
+    align-items: center; /* Ensures vertical alignment */
+    margin-top:4%;
+   
+}
+
+.settings img {
+    grid-column: 2; /* Place image in the second column */
+    grid-row: 1 / span 3; /* Make the image span all 5 rows */
+    align-self: center; /* Centers the image vertically */
+    padding-top: 72px;
+}
+
+.settings .textBox{
+    width: 52%;
+    font-weight: bold;
+    background-color: black;
+    color: white;
+    margin: 40px 0px 0px 64px;
+    padding: 0.8rem;
+    font-size: 24px;
+    border-radius: 1.2rem;
+}
+
+.inputBox{
+    background-color: transparent;
+    color: white;
+    border: none;
+    width: 80%;
+}
+
+.settings .gridBox {
+    display:flex; 
+    align-items: center;
+    /* margin-bottom: 2% */
+}
+
+.edit-button{
+    background-color: #EBEBEB;
+    padding: 1rem;
+    margin: 36px 0 0 56px;
+    border-radius: 16px;
+    
+}
+
+/* .edit-button {
+    background-color: #EBEBEB;
+    padding: 1rem;
+    margin: 36px 0 0 56px;
+    border-radius: 16px;
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    outline: none;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease-out;
+} */
+
+/* Soft glow shadow */
+.edit-button::before {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 10px;
+    right: 10px;
+    height: 20px;
+    border-radius: 50px;
+    background: rgba(200, 200, 200, 0.6); /* Soft grey shadow */
+    filter: blur(10px);
+    transition: all 0.2s ease-out;
+    z-index: -1;
+}
+
+/* Hover effect: Keeps color intact */
+.edit-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(150, 150, 150, 0.4);
+    background-color: #d6d6d6; /* Slightly darker grey */
+}
+
+/* Click effect: Slight press-down without transparency */
+.edit-button:active {
+    transform: scale(0.96);
+    box-shadow: 0 5px 10px rgba(150, 150, 150, 0.6);
+    background-color: #c4c4c4; /* Darker grey when clicked */
+}
+
+
+.delete-button {
+    background-color: #D9534F;
+    border: none;
+    padding: 32px 120px;
+    border-radius: 20px;
+    font-weight: bold;
+    color: white;
+    font-size: 24px;
+    margin-top: 16px;
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    outline: none;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+/* Add the shadow effect */
+.delete-button::before {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 10px;
+    right: 10px;
+    height: 20px;
+    border-radius: 50px;
+    background: rgba(217, 83, 79, 0.5); /* Soft shadow in the same color */
+    filter: blur(10px);
+    transition: all 0.2s ease-out;
+    background-color: #D9534F;
+}
+
+/* Hover effect (keeps color intact) */
+.delete-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(217, 83, 79, 0.4);
+}
+
+/* Click effect */
+.delete-button:active {
+    transform: scale(0.96);
+    box-shadow: 0 5px 10px rgba(217, 83, 79, 0.6);
+}
+
+
+.logo {
+    grid-column: 2; /* Place image in the second column */
+    grid-row: 1 / span 5; /* Make the image span all 5 rows */
+    align-self: center; /* Centers the image vertically */
+    padding-top: 72px;
+}
+
+
+/* Modal */
+#deleteButtonDialog{
+    justify-items: center;
+    border: none;
+    height: 600px;
+    width: 600px;
+    border-radius: 16px;
+    justify-self: anchor-center;
+    align-self: center;
+}
+
+.dialogButton {
+    border: none;
+    padding: 8px 36px;
+    font-size: 20px;
+    color: white;
+    border-radius: 8px;
+}
+
+#currency-dropDown{
+    background-color: black;
+    color: white;
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: white;
+    max-width: 400px;
+}
+
+.confirm-btn{
+    /* border:10rem; */
+    display: flex;
+    justify-self: center;
+    margin-top: 20px;
+}
+
+.confirm-btn button{
+    padding: 20px 108px;
+    margin-left: -60px;
+    font-weight: bold;
+    border-radius: 12px;
+    
+}
