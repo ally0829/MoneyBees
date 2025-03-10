@@ -772,9 +772,6 @@ def get_current_user(request):
         "username": getattr(request.user, "username", request.user.email)
     })
 
-
-
-
 @login_required
 def yearly_summary(request):
     """
