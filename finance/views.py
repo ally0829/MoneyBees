@@ -23,6 +23,7 @@ from .services import convert_to_default_currency, calculate_total_amount, fetch
 
 logger = logging.getLogger(__name__)
 
+
 @csrf_exempt
 def toggle_notifications(request):
     if request.method == "POST":
@@ -36,6 +37,7 @@ def toggle_notifications(request):
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
     return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
+
 
 @login_required
 def home_view(request):
@@ -215,12 +217,21 @@ def edit_expense(request, expense_id):
 
     if request.method == 'POST':
         # If form was submitted, process the form
-        expense_form = ExpenseForm(request.POST, instance=expense)
+        expense_form = ExpenseForm(
+            request.POST, instance=expense, exchange_rates=exchange_rates)
         if expense_form.is_valid():
             # Save the form but don't commit to the database yet
             updated_expense = expense_form.save(commit=False)
             # Make sure the user isn't changed
             updated_expense.user = expense.user
+
+            # Handle currency if provided in POST data
+            currency_code = request.POST.get('currency_display')
+            if currency_code:
+                currency, created = Currency.objects.get_or_create(
+                    currency=currency_code)
+                updated_expense.currency = currency
+
             # Now save to the database
             updated_expense.save()
 
@@ -232,7 +243,9 @@ def edit_expense(request, expense_id):
         expense_form = ExpenseForm(
             instance=expense,
             # This provides the user for the currency label
-            initial={'user': expense.user}
+            initial={'user': expense.user},
+            # Pass exchange rates to the form
+            exchange_rates=exchange_rates
         )
 
     return render(request, 'finance/add_expense_income.html', {
@@ -240,37 +253,47 @@ def edit_expense(request, expense_id):
         "form": expense_form,
         "type": "expense",
         "is_edit": True,  # Flag to indicate we're editing, not adding
-        "expense_id": expense_id,  # Pass the expense ID to the template,
-        "currency": exchange_rates
+        "expense_id": expense_id  # Pass the expense ID to the template
     })
 
 
 def edit_income(request, income_id):
     exchange_rates = fetch_exchange_rates()
 
-    # Get the expense instance that we want to edit
+    # Get the income instance that we want to edit
     income = get_object_or_404(Income, id=income_id)
 
     if request.method == 'POST':
         # If form was submitted, process the form
-        income_form = IncomeForm(request.POST, instance=income)
+        income_form = IncomeForm(
+            request.POST, instance=income, exchange_rates=exchange_rates)
         if income_form.is_valid():
             # Save the form but don't commit to the database yet
             updated_income = income_form.save(commit=False)
             # Make sure the user isn't changed
             updated_income.user = income.user
+
+            # Handle currency if provided in POST data
+            currency_code = request.POST.get('currency_display')
+            if currency_code:
+                currency, created = Currency.objects.get_or_create(
+                    currency=currency_code)
+                updated_income.currency = currency
+
             # Now save to the database
             updated_income.save()
 
-            # Redirect to expense record page after successful update
+            # Redirect to income record page after successful update
             return redirect('finance:income_record')
 
     else:
-        # Initialize form with the expense instance and user
+        # Initialize form with the income instance and user
         income_form = IncomeForm(
             instance=income,
             # This provides the user for the currency label
-            initial={'user': income.user}
+            initial={'user': income.user},
+            # Pass exchange rates to the form
+            exchange_rates=exchange_rates
         )
 
     return render(request, 'finance/add_expense_income.html', {
@@ -278,8 +301,7 @@ def edit_income(request, income_id):
         "form": income_form,
         "type": "income",
         "is_edit": True,  # Flag to indicate we're editing, not adding
-        "income_id": income_id,
-        "currency": exchange_rates
+        "income_id": income_id  # Pass the income ID to the template
     })
 
 
@@ -388,7 +410,6 @@ def income_record_view(request):
     if category and category != "ALL":
         incomes = incomes.filter(category__name=category)
 
-
     return render(request, 'finance/incomeRecord.html', {
         'categories': categories,
         'incomes': incomes,
@@ -397,6 +418,7 @@ def income_record_view(request):
     })
 
 #  load Upcoming Expense page，including Category & Payments
+
 
 @login_required
 def upcomingExpense_view(request):
@@ -425,7 +447,8 @@ def add_upcoming_payment(request):
             print("Received data:", data)  # Debug: Print the received data
 
             # Validate required fields
-            required_fields = ["category", "date", "amount", "description", "currency"]
+            required_fields = ["category", "date",
+                               "amount", "description", "currency"]
             for field in required_fields:
                 if field not in data:
                     return JsonResponse({"error": f"Missing required field: {field}"}, status=400)
@@ -453,7 +476,8 @@ def add_upcoming_payment(request):
                 currency=currency_code,
                 defaults={
                     "rate": rates[currency_code],  # Use the rate from the API
-                    "timestamp": exchange_rates.get("timestamp")  # Use the timestamp from the API
+                    # Use the timestamp from the API
+                    "timestamp": exchange_rates.get("timestamp")
                 }
             )
 
@@ -484,12 +508,14 @@ def edit_upcoming_payment(request, payment_id):
                 UpcomingPayment, id=payment_id, user=request.user)
             data = json.loads(request.body)
             category = get_object_or_404(ExpenseCategory, id=data["category"])
-            currency_code = data.get("currency", "USD")  # Default to USD if not provided
+            # Default to USD if not provided
+            currency_code = data.get("currency", "USD")
 
             # Get or create the Currency object
             currency, created = Currency.objects.get_or_create(
                 currency=currency_code,
-                defaults={"rate": 1.0, "timestamp": 1698765432}  # Default values for new objects
+                # Default values for new objects
+                defaults={"rate": 1.0, "timestamp": 1698765432}
             )
 
             payment.category = category
@@ -556,6 +582,7 @@ def test_email(request):
         return HttpResponse(f"Error sending email: {str(e)}")
 # API: return the percentage of the expense per month in the home page
 
+
 @login_required
 def spending_summary(request):
     user = request.user
@@ -609,7 +636,8 @@ def spending_summary(request):
         {
             "category_id": category['category_id'],
             "category": category['category'],
-            "amount": float(category['total']),  # Convert Decimal to float for JSON serialization
+            # Convert Decimal to float for JSON serialization
+            "amount": float(category['total']),
             "percentage": round((category['total'] / total_spent) * 100, 2) if total_spent > 0 else 0
         }
         for category in category_data
@@ -620,10 +648,14 @@ def spending_summary(request):
 
     # Return the JSON response
     return JsonResponse({
-        "total_spent": float(total_spent),  # Convert Decimal to float for JSON serialization
-        "currency_symbol": user.currency.currency,  # Include the currency symbol (e.g., AED, USD)
+        # Convert Decimal to float for JSON serialization
+        "total_spent": float(total_spent),
+        # Include the currency symbol (e.g., AED, USD)
+        "currency_symbol": user.currency.currency,
         "categories": data
     })
+
+
 @login_required
 def upcoming_expenses(request):
 
@@ -673,7 +705,7 @@ def expense_targets(request):
                     "category": target.category.name,
                     "target_amount": float(target.amount),
                     "month": target.month,
-                    
+
                 })
             else:
                 return JsonResponse({"message": "No target found"}, status=404)
@@ -775,6 +807,7 @@ def get_current_user(request):
         "username": getattr(request.user, "username", request.user.email)
     })
 
+
 @login_required
 def yearly_summary(request):
     """
@@ -790,7 +823,8 @@ def yearly_summary(request):
     for month in range(1, 13):
         monthly_data.append({
             "month": month,
-            "month_name": datetime(current_year, month, 1).strftime('%b'),  # Month abbreviation (Jan, Feb, etc.)
+            # Month abbreviation (Jan, Feb, etc.)
+            "month_name": datetime(current_year, month, 1).strftime('%b'),
             "income": Decimal(0),  # Use Decimal for precision
             "expenses": Decimal(0)  # Use Decimal for precision
         })

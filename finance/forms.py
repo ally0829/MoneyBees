@@ -12,7 +12,8 @@ class IncomeForm(forms.ModelForm):
 
     class Meta:
         model = Income
-        fields = ['date', 'category', 'amount', 'description']  # Currency is third in order
+        # Currency is third in order
+        fields = ['date', 'category', 'amount', 'description']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date', 'max': date.today().strftime('%Y-%m-%d')}),
             'amount': forms.NumberInput(attrs={'step': '0.01'}),
@@ -30,7 +31,8 @@ class IncomeForm(forms.ModelForm):
 
         if exchange_rates and 'rates' in exchange_rates:
             rates = exchange_rates['rates']
-            currency_choices = [(currency, currency) for currency in rates.keys()]
+            currency_choices = [(currency, currency)
+                                for currency in rates.keys()]
 
             # Adding a new currency field at the third position
             self.fields['currency_display'] = forms.ChoiceField(
@@ -40,13 +42,15 @@ class IncomeForm(forms.ModelForm):
             )
 
             # Reorder fields to ensure currency is third in display order
-            self.order_fields(['date', 'category', 'currency_display', 'currency', 'amount', 'description'])
+            self.order_fields(
+                ['date', 'category', 'currency_display', 'currency', 'amount', 'description'])
 
 
 class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Expense
-        fields = ['date', 'category', 'amount', 'description']  # Currency remains third in order
+        # Currency remains third in order
+        fields = ['date', 'category', 'amount', 'description']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date', 'max': date.today().strftime('%Y-%m-%d')}),
             'amount': forms.NumberInput(attrs={'step': '0.01'}),
@@ -67,7 +71,8 @@ class ExpenseForm(forms.ModelForm):
         # Populate the currency field with the exchange rates
         if exchange_rates and 'rates' in exchange_rates:
             rates = exchange_rates['rates']
-            currency_choices = [(currency, currency) for currency in rates.keys()]
+            currency_choices = [(currency, currency)
+                                for currency in rates.keys()]
 
             # Adding a new currency display field
             self.fields['currency_display'] = forms.ChoiceField(
@@ -77,4 +82,5 @@ class ExpenseForm(forms.ModelForm):
             )
 
             # Reorder fields to ensure currency is third in display order
-            self.order_fields(['date', 'category', 'currency_display', 'currency', 'amount', 'description'])
+            self.order_fields(
+                ['date', 'category', 'currency_display', 'currency', 'amount', 'description'])
