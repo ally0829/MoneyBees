@@ -1,3 +1,17 @@
+// Get references to the form and confirm button
+const form = document.getElementById('settings-form');
+const confirmBtn = document.getElementById('confirm-btn');
+
+// Get the initial values of the form fields
+const initialValues = {
+    first_name: form.querySelector('[name="first_name"]').value,
+    last_name: form.querySelector('[name="last_name"]').value,
+    email: form.querySelector('[name="email"]').value,
+    password: form.querySelector('[name="password"]').value,
+    currency: form.querySelector('[name="currency"]').value,
+};
+
+
 document.getElementById("inpb1").onclick = function (event) {
     hidePassword(event); // Hide password if another field is clicked
     toggleInput("inp1");
@@ -41,6 +55,7 @@ document.addEventListener("click", function (event) {
     hidePassword(event);
 });
 
+
 function hidePassword(event) {
     let passwordField = document.getElementById("inp3");
 
@@ -74,18 +89,15 @@ document.getElementById("cancel").onclick = function() {
     document.getElementById("deleteButtonDialog").close();
 }
 
-    // Get references to the form and confirm button
-    const form = document.getElementById('settings-form');
-    const confirmBtn = document.getElementById('confirm-btn');
+// document.addEventListener('DOMContentLoaded', function() {
+//     // Add event listeners here
+//     document.getElementById('dlt').addEventListener('click', function() {
+//         console.log("Confirm delete button clicked!");  // Debugging
+//         document.getElementById("deleteButtonDialog").close();  // Close the dialog after click
+//     });
+// });
 
-    // Get the initial values of the form fields
-    const initialValues = {
-        first_name: form.querySelector('[name="first_name"]').value,
-        last_name: form.querySelector('[name="last_name"]').value,
-        email: form.querySelector('[name="email"]').value,
-        password: form.querySelector('[name="password"]').value,
-        currency: form.querySelector('[name="currency"]').value,
-    };
+
 
     // Function to check if the form has changed
 function checkFormChanges() {
@@ -108,19 +120,56 @@ function checkFormChanges() {
         } else {
             confirmBtn.style.display = 'none';
         }
-    }
+}
 
     // Add event listeners to form fields
-    form.querySelectorAll('input, select').forEach(field => {
-        field.addEventListener('input', checkFormChanges);
-        field.addEventListener('change', checkFormChanges);
+form.querySelectorAll('input, select').forEach(field => {
+    field.addEventListener('input', checkFormChanges);
+    field.addEventListener('change', checkFormChanges);
+});
+
+// Initial check in case the form is pre-filled with changes
+checkFormChanges();
+
+// $(document).ready(function() {
+//     $('#confirmDelete').click(function() {
+//         console.log("Button clicked!"); // Debugging
+//         window.location.href = "/users/login";
+//     });
+// });
+
+
+// Get the CSRF token from the meta tag
+const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+document.getElementById('confirmDelete').onclick = function() {
+    console.log("Confirm Delete button clicked!"); // Debugging
+
+    // Close the dialog
+    const dialog = document.getElementById("deleteButtonDialog");
+    dialog.close();
+
+    // Get the delete URL
+    const deleteUrl = "/finance/delete-account/";
+
+    // Send a POST request to delete the account
+    fetch(deleteUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,  // Use the CSRF token from the meta tag
+        },
+        body: JSON.stringify({}),  // No data needed in the body
+    })
+    .then(response => {
+        if (response.redirected) {
+            // Redirect to the login page after successful deletion
+            window.location.href = response.url;
+        } else {
+            console.error("Failed to delete account:", response.statusText);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
     });
-
-    // Initial check in case the form is pre-filled with changes
-    checkFormChanges();
-
-    // $(document).ready(function() {
-    //     $('#deleteAccountBtn').click(function() {
-    //         alert("Button clicked!"); // Test if the click event works
-    //     });
-    // });
+};

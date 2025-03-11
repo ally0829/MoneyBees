@@ -5,10 +5,13 @@
 
 <link rel="stylesheet" href="{% static 'css/settings.css' %}">
 {{ block.super }}
+
 {% endblock %}
 
 
 {% block main %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+
 <div class="settings">
 
     <form method="POST" action={% url "finance:settings" %} id="settings-form">
@@ -101,6 +104,8 @@
 
 </div>
 
+
+
 <dialog id="deleteButtonDialog">
     <button style="display:flex; justify-self:right; border:none; background-color:transparent" id="closeDialog">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg"
@@ -120,11 +125,11 @@
     <h5 style="color:rgb(106, 102, 102); margin-top:32px; text-align-last:center">Do you really want to delete this
         account? This process cannot be undone.</h5>
     <div style="display:flex; gap:28px; margin-top:40px">
-        <button type="button" id="cancel" class="dialogButton" style="background-color: #C1C1C1;">Cancel</button>
-        <button type="button" id="deleteAccountBtn" class="dialogButton" 
-        style="background-color: #FF225D;">Delete</button>
+        <button type="button" id="confirmDelete" class="dialogButton" style="background-color: #FF225D;">Delete</button>
+        <button type="button" id="cancel" class="dialogButton" style="background-color: #C1C1C1;">Cancel</button>   
     </div>
 </dialog>
+
 
 
 

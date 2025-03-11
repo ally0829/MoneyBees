@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib import messages
+from django.contrib.auth import logout
 from django.core.mail import send_mail
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -927,3 +929,16 @@ def yearly_summary(request):
         "monthly_data": monthly_data,
         "yearly_totals": yearly_totals
     })
+
+@login_required
+@require_POST  # Ensure this view only accepts POST requests
+def delete_account(request):
+    # Delete the user's account
+    user = request.user
+    user.delete()
+
+    # Log the user out
+    logout(request)
+
+    # Redirect to the login page
+    return redirect('login') 

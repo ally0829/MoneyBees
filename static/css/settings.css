@@ -184,8 +184,9 @@
 .confirm-btn{
     /* border:10rem; */
     display: flex;
-    justify-self: center;
+    /* justify-self: center; */
     margin-top: 20px;
+    margin-left: 8%;
 }
 
 .confirm-btn button{
