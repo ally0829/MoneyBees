@@ -35,22 +35,21 @@ class IncomeForm(forms.ModelForm):
                                 for currency in rates.keys()]
 
             # Adding a new currency field at the third position
-            self.fields['currency_display'] = forms.ChoiceField(
+            self.fields['currency'] = forms.ChoiceField(
                 choices=currency_choices,
-                label="Currency",
+                label="currency",
                 initial=user.currency.currency if user and user.currency else 'USD',  # Default to 'USD'
             )
 
             # Reorder fields to ensure currency is third in display order
             self.order_fields(
-                ['date', 'category', 'currency_display', 'currency', 'amount', 'description'])
+                ['date', 'category', 'currency',  'amount', 'description'])
 
 
 class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Expense
-        # Currency remains third in order
-        fields = ['date', 'category', 'amount', 'description']
+        fields = ['date', 'category', 'amount', 'description',]  
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date', 'max': date.today().strftime('%Y-%m-%d')}),
             'amount': forms.NumberInput(attrs={'step': '0.01'}),
@@ -75,7 +74,7 @@ class ExpenseForm(forms.ModelForm):
                                 for currency in rates.keys()]
 
             # Adding a new currency display field
-            self.fields['currency_display'] = forms.ChoiceField(
+            self.fields['currency'] = forms.ChoiceField(
                 choices=currency_choices,
                 label="Currency",
                 initial=user.currency.currency if user and user.currency else 'USD',  # Default to 'USD'
@@ -83,4 +82,5 @@ class ExpenseForm(forms.ModelForm):
 
             # Reorder fields to ensure currency is third in display order
             self.order_fields(
-                ['date', 'category', 'currency_display', 'currency', 'amount', 'description'])
+                ['date', 'category', 'currency', 'amount', 'description'])
+
