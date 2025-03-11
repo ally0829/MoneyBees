@@ -3,7 +3,7 @@ from .models import Income, ExpenseCategory, Expense, MonthlyExpenseTarget, Inco
 
 
 class IncomeCategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'description')
+    list_display = ('id', 'name')
 
 
 admin.site.register(Income)
