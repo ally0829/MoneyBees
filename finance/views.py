@@ -705,28 +705,59 @@ def expense_targets(request):
                     "category": target.category.name,
                     "target_amount": float(target.amount),
                     "month": target.month,
+                    "currency": user.currency.currency  # Include currency in response
 
                 })
             else:
                 return JsonResponse({"message": "No target found"}, status=404)
-
+        # Fetch all targets for the current month
         targets = MonthlyExpenseTarget.objects.filter(
             user=user, month=current_month)
+        # Fetch expenses for the current month and group by category
         expenses = Expense.objects.filter(user=user, date__year=current_year, date__month=current_month).values(
             'category').annotate(total=Sum('amount'))
         expense_dict = {expense['category']: expense['total']
                         for expense in expenses}
 
-        data = [
-            {
+        # data = [
+        #     {
+        #         "category": target.category.name,
+        #         "target_amount": float(target.amount),
+        #         "current_spent": float(expense_dict.get(target.category.id, 0)),
+        #         "progress": round((expense_dict.get(target.category.id, 0) / target.amount) * 100, 2) if target.amount > 0 else 0,
+        #         "currency": user.currency.currency
+        #     }
+        #     for target in targets
+        # ]
+        # Prepare data for JSON response
+        data = []
+        for target in targets:
+            # Convert target amount to the user's default currency
+            target_amount = Decimal(target.amount)
+
+            # Get the current spending for the category
+            current_spent = Decimal(expense_dict.get(target.category.id, 0))
+
+            # Convert current spending to the user's default currency
+            for expense in Expense.objects.filter(user=user, category=target.category, date__year=current_year, date__month=current_month):
+                converted_amount = convert_to_default_currency(
+                    amount=expense.amount,
+                    expense_currency=expense.currency.currency,
+                    default_currency=user.currency.currency,
+                    transaction_date=expense.date
+                )
+                current_spent += converted_amount
+
+            # Calculate progress percentage
+            progress = round((current_spent / target_amount) * 100, 2) if target_amount > 0 else 0
+
+            data.append({
                 "category": target.category.name,
-                "target_amount": float(target.amount),
-                "current_spent": float(expense_dict.get(target.category.id, 0)),
-                "progress": round((expense_dict.get(target.category.id, 0) / target.amount) * 100, 2) if target.amount > 0 else 0,
-                "currency": user.currency.currency
-            }
-            for target in targets
-        ]
+                "target_amount": float(target_amount),  # Convert Decimal to float for JSON
+                "current_spent": float(current_spent),  # Convert Decimal to float for JSON
+                "progress": progress,
+                "currency": user.currency.currency  # Include currency in response
+            })
 
         return JsonResponse({"expense_targets": data})
 
