@@ -140,13 +140,25 @@ def add_income(request):
     exchange_rates = fetch_exchange_rates()
 
     if request.method == 'POST':
-        print("POST data:", request.POST)
+        # print("POST data:", request.POST)
 
         income_form = IncomeForm(request.POST, initial={
                                  'user': request.user}, exchange_rates=exchange_rates)
         if income_form.is_valid():
-            income = income_form.save(commit=False)
-            income.user = request.user
+            category = IncomeCategory.objects.get(
+                name=income_form.cleaned_data['category'])
+            income = Income(
+                user=request.user,
+                amount=income_form.cleaned_data['amount'],
+                category=category,
+                date=income_form.cleaned_data['date'],
+                description=income_form.cleaned_data['description'],
+                # Save the selected currency
+                currency=Currency.objects.get(
+                    currency=income_form.cleaned_data['currency'])
+            )
+            # income = income_form.save(commit=False)
+            # income.user = request.user
 
             # currency_code = request.POST.get('currency_display')
 
