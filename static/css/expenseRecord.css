@@ -3,7 +3,6 @@
     font-size: 2rem;
 }
 
-
 .expense-container {
     display: flex;
     flex-direction: column;
@@ -20,6 +19,7 @@
     border-collapse: collapse;
     margin-top: 20px;
     background: white;
+    font-size: 16px;
 }
 
 .expense-table thead {
@@ -33,7 +33,6 @@
     border: 2px solid #ccc;
     padding: 10px;
     text-align: left;
-
 }
 
 .expense-table tfoot {
@@ -50,15 +49,10 @@
     background-color: #FFEB85;
 }
 
-
 .date-filter label,
 .date-filter select,
 .date-filter input {
     font-weight: 400;
-}
-
-.expense-table {
-    font-size: 16px;
 }
 
 .edit-btn {
@@ -103,4 +97,129 @@
 .action-buttons {
     display: flex;
     gap: 5px;
+}
+
+/* Date filter responsive styles */
+.date-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    .expense-container {
+        padding: 10px;
+    }
+
+    .expense-container h2 {
+        font-size: 1.5rem;
+    }
+
+    .expense-table {
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .expense-table th,
+    .expense-table td {
+        padding: 8px 5px;
+    }
+
+    .date-filter {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .date-filter input,
+    .date-filter select {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+    }
+
+    .search-btn {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 10px;
+    }
+}
+
+/* Small mobile devices - card layout for table */
+@media (max-width: 576px) {
+    .expense-container h2 {
+        font-size: 1.3rem;
+    }
+
+    /* Convert table to card layout */
+    .expense-table {
+        font-size: 13px;
+    }
+
+    .expense-table thead {
+        display: none;
+        /* Hide table header */
+    }
+
+    .expense-table,
+    .expense-table tbody,
+    .expense-table tr {
+        display: block;
+        width: 100%;
+    }
+
+    .expense-table tr {
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .expense-table td {
+        display: flex;
+        justify-content: space-between;
+        text-align: right;
+        padding: 8px 5px;
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+    }
+
+    .expense-table td:before {
+        content: attr(data-label);
+        font-weight: bold;
+        text-align: left;
+        padding-right: 10px;
+    }
+
+    .expense-table td:last-child {
+        border-bottom: none;
+    }
+
+    .expense-table tfoot {
+        display: block;
+        width: 100%;
+    }
+
+    .expense-table tfoot tr {
+        margin-bottom: 0;
+    }
+
+    .expense-table tfoot td.total-row {
+        display: block;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .action-buttons {
+        justify-content: center;
+    }
+
+    .edit-btn,
+    .delete-btn {
+        padding: 6px 12px;
+    }
 }

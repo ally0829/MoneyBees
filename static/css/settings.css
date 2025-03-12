@@ -5,70 +5,58 @@
     margin-left: 8%;
 }
 
-#settings-form{
+#settings-form {
     grid-row: 1, span 3;
-    /* display: grid; */
-    /* grid-template-columns: 75%; */
     grid-template-rows: repeat(6, 20%);
-    align-items: center; /* Ensures vertical alignment */
-    margin-top:4%;
-   
+    align-items: center;
+    margin-top: 4%;
 }
 
 .settings img {
-    grid-column: 2; /* Place image in the second column */
-    grid-row: 1 / span 3; /* Make the image span all 5 rows */
-    align-self: center; /* Centers the image vertically */
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    align-self: center;
     padding-top: 72px;
+    max-width: 100%;
+    height: auto;
 }
 
-.settings .textBox{
-    width: 52%;
+.settings .textBox {
+    width: 85%;
+    /* Increased from 72% */
     font-weight: bold;
     background-color: black;
     color: white;
     margin: 40px 0px 0px 64px;
-    padding: 0.8rem;
-    font-size: 24px;
+    padding: 1.2rem;
+    /* Increased from 0.8rem */
+    font-size: 26px;
+    /* Increased from 24px */
     border-radius: 1.2rem;
 }
 
-.inputBox{
+.inputBox {
     background-color: transparent;
     color: white;
     border: none;
-    width: 80%;
+    width: 85%;
+    /* Increased from 80% */
+    font-size: 22px;
+    /* Added font size */
 }
 
 .settings .gridBox {
-    display:flex; 
+    display: flex;
     align-items: center;
-    /* margin-bottom: 2% */
 }
 
-.edit-button{
+.edit-button {
     background-color: #EBEBEB;
     padding: 1rem;
     margin: 36px 0 0 56px;
     border-radius: 16px;
-    
-}
-
-/* .edit-button {
-    background-color: #EBEBEB;
-    padding: 1rem;
-    margin: 36px 0 0 56px;
-    border-radius: 16px;
-    font-weight: bold;
-    color: #333;
-    font-size: 16px;
-    cursor: pointer;
     position: relative;
-    display: inline-block;
-    text-align: center;
-    outline: none;
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease-out;
-} */
+}
 
 /* Soft glow shadow */
 .edit-button::before {
@@ -79,26 +67,25 @@
     right: 10px;
     height: 20px;
     border-radius: 50px;
-    background: rgba(200, 200, 200, 0.6); /* Soft grey shadow */
+    background: rgba(200, 200, 200, 0.6);
     filter: blur(10px);
     transition: all 0.2s ease-out;
     z-index: -1;
 }
 
-/* Hover effect: Keeps color intact */
+/* Hover effect */
 .edit-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(150, 150, 150, 0.4);
-    background-color: #d6d6d6; /* Slightly darker grey */
+    background-color: #d6d6d6;
 }
 
-/* Click effect: Slight press-down without transparency */
+/* Click effect */
 .edit-button:active {
     transform: scale(0.96);
     box-shadow: 0 5px 10px rgba(150, 150, 150, 0.6);
-    background-color: #c4c4c4; /* Darker grey when clicked */
+    background-color: #c4c4c4;
 }
-
 
 .delete-button {
     background-color: #D9534F;
@@ -117,7 +104,7 @@
     transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
 }
 
-/* Add the shadow effect */
+/* Delete button shadow */
 .delete-button::before {
     content: "";
     position: absolute;
@@ -126,13 +113,13 @@
     right: 10px;
     height: 20px;
     border-radius: 50px;
-    background: rgba(217, 83, 79, 0.5); /* Soft shadow in the same color */
+    background: rgba(217, 83, 79, 0.5);
     filter: blur(10px);
     transition: all 0.2s ease-out;
     background-color: #D9534F;
 }
 
-/* Hover effect (keeps color intact) */
+/* Hover effect */
 .delete-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(217, 83, 79, 0.4);
@@ -144,17 +131,15 @@
     box-shadow: 0 5px 10px rgba(217, 83, 79, 0.6);
 }
 
-
 .logo {
-    grid-column: 2; /* Place image in the second column */
-    grid-row: 1 / span 5; /* Make the image span all 5 rows */
-    align-self: center; /* Centers the image vertically */
+    grid-column: 2;
+    grid-row: 1 / span 5;
+    align-self: center;
     padding-top: 72px;
 }
 
-
-/* Modal */
-#deleteButtonDialog{
+/* Dialog */
+#deleteButtonDialog {
     justify-items: center;
     border: none;
     height: 600px;
@@ -172,7 +157,7 @@
     border-radius: 8px;
 }
 
-#currency-dropDown{
+#currency-dropDown {
     background-color: black;
     color: white;
     border-radius: 8px;
@@ -181,18 +166,97 @@
     max-width: 400px;
 }
 
-.confirm-btn{
-    /* border:10rem; */
+.confirm-btn {
     display: flex;
-    /* justify-self: center; */
     margin-top: 20px;
     margin-left: 8%;
 }
 
-.confirm-btn button{
+.confirm-btn button {
     padding: 20px 108px;
     margin-left: -60px;
     font-weight: bold;
     border-radius: 12px;
-    
+}
+
+/* Media query for medium screens */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+    .settings {
+        grid-template-columns: 65% 35%;
+    }
+
+    .settings .textBox {
+        width: 80%;
+        margin-left: 30px;
+        padding: 1rem;
+        font-size: 24px;
+    }
+
+    .inputBox {
+        font-size: 20px;
+    }
+
+    .edit-button {
+        margin-left: 30px;
+    }
+
+    .delete-button {
+        padding: 25px 80px;
+    }
+}
+
+/* Media query for smaller screens */
+@media screen and (max-width: 768px) {
+    .settings {
+        grid-template-columns: 100%;
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+
+    .settings img,
+    .logo {
+        grid-column: 1;
+        grid-row: auto;
+        justify-self: center;
+        margin-top: 30px;
+    }
+
+    .settings .textBox {
+        width: 90%;
+        margin-left: 20px;
+        margin-right: 20px;
+        padding: 1rem;
+        font-size: 22px;
+    }
+
+    .inputBox {
+        font-size: 20px;
+    }
+
+    .edit-button {
+        margin-left: 20px;
+    }
+
+    .delete-button {
+        padding: 20px;
+        width: 85%;
+        text-align: center;
+    }
+
+    .confirm-btn {
+        margin-left: 5%;
+    }
+
+    .confirm-btn button {
+        padding: 15px;
+        width: 80%;
+        margin-left: 0;
+    }
+
+    #deleteButtonDialog {
+        width: 90%;
+        height: auto;
+        max-width: 400px;
+        padding: 20px;
+    }
 }

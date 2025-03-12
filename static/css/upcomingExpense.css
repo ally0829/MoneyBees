@@ -20,8 +20,6 @@ body {
     /* Fixed position to prevent scrolling */
 }
 
-
-
 /* the title */
 h1 {
     font-weight: 700;
@@ -177,4 +175,151 @@ textarea {
 
 .expense-list .paid-btn:hover {
     background-color: darkgreen;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+
+    html,
+    body {
+        overflow: auto;
+        position: static;
+        height: 100%;
+    }
+
+    h1 {
+        font-size: 28px;
+        margin-bottom: 10px;
+        padding-top: 10px;
+    }
+
+    .container {
+        height: auto;
+        overflow: auto;
+    }
+
+    .upcoming-expense {
+        flex-direction: column;
+        height: auto;
+        gap: 15px;
+        width: 100%;
+        margin: 0;
+        padding: 10px;
+    }
+
+    .expense-form {
+        max-width: 100%;
+        min-width: 0;
+        width: 100%;
+        max-height: none;
+        margin-bottom: 15px;
+    }
+
+    .expense-list {
+        max-width: 100%;
+        min-width: 0;
+        width: 100%;
+        max-height: none;
+        overflow-x: auto;
+    }
+
+    .form-buttons button {
+        font-size: 16px;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    h1 {
+        font-size: 24px;
+    }
+
+    label {
+        font-size: 14px;
+    }
+
+    input,
+    select,
+    textarea {
+        font-size: 14px;
+        padding: 6px;
+    }
+
+    .expense-form {
+        padding: 15px;
+    }
+
+    .form-buttons button {
+        font-size: 14px;
+        padding: 6px 10px;
+        margin-right: 5px;
+    }
+
+    /* Card-style table on small screens */
+    .expense-list table,
+    .expense-list tbody,
+    .expense-list tr {
+        display: block;
+        width: 100%;
+    }
+
+    .expense-list thead {
+        display: none;
+    }
+
+    .expense-list tbody tr {
+        margin-bottom: 15px;
+        border: 1px solid black;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .expense-list td {
+        display: flex;
+        justify-content: space-between;
+        text-align: right;
+        padding: 8px;
+        border: none;
+        border-bottom: 1px solid #ddd;
+        font-size: 14px;
+    }
+
+    .expense-list td:before {
+        content: attr(data-label);
+        font-weight: bold;
+        text-align: left;
+        margin-right: 10px;
+    }
+
+    .expense-list td:last-child {
+        border-bottom: none;
+        justify-content: center;
+    }
+
+    .expense-list .edit-btn,
+    .expense-list .paid-btn {
+        padding: 5px 8px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 400px) {
+    h1 {
+        font-size: 22px;
+    }
+
+    .expense-form {
+        padding: 10px;
+    }
+
+    .form-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-buttons button {
+        width: 100%;
+        margin-right: 0;
+    }
 }

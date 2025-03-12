@@ -10,9 +10,6 @@ body {
   /* Changed to viewport height */
 }
 
-
-
-
 .home {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -44,7 +41,6 @@ body {
   width: 100%;
   overflow-y: auto;
 }
-
 
 .upcoming-payments {
   background: black;
@@ -348,4 +344,146 @@ body {
 h2,
 h3 {
   margin: 0 0 10px 0;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  body {
+    overflow: auto;
+    height: auto;
+  }
+
+  .home {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    max-height: none;
+    height: auto;
+    padding: 10px;
+    gap: 15px;
+    overflow-y: auto;
+  }
+
+  .spending {
+    grid-column: 1;
+    grid-row: 1;
+    height: auto;
+    max-height: none;
+    padding: 15px;
+  }
+
+  .upcoming-payments {
+    grid-column: 1;
+    grid-row: 2;
+    padding: 15px;
+  }
+
+  .expense-target {
+    grid-column: 1;
+    grid-row: 3;
+    padding: 15px;
+  }
+
+  .chart-info-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .chart-container {
+    max-width: 220px;
+  }
+
+  .category-info {
+    width: 100%;
+  }
+
+  .bar-chart-container {
+    height: 200px;
+  }
+
+  .header-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .header-container h2 {
+    margin-bottom: 5px;
+  }
+
+  .actionbtn-container {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .action-btn {
+    flex: 1 0 auto;
+    min-width: 120px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .home {
+    padding: 5px;
+    gap: 10px;
+  }
+
+  .spending,
+  .upcoming-payments,
+  .expense-target {
+    padding: 12px;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+
+  .chart-container {
+    max-width: 180px;
+  }
+
+  .chart-center-text {
+    font-size: 16px;
+  }
+
+  .payment-list,
+  .target-list {
+    max-height: 120px;
+  }
+
+  .bar-chart-container {
+    height: 180px;
+    padding: 10px;
+  }
+
+  .action-btn {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+}
+
+/* For very small screens */
+@media (max-width: 350px) {
+  .chart-container {
+    max-width: 150px;
+  }
+
+  .chart-center-text {
+    font-size: 14px;
+  }
+
+  .action-btn {
+    min-width: 100px;
+    font-size: 11px;
+  }
+
+  .payment-item {
+    flex-direction: column;
+    gap: 5px;
+  }
 }

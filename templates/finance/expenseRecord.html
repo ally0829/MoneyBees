@@ -46,23 +46,25 @@
                 <tbody>
                     {% for expense in expenses %}
                     <tr>
-                        <td>{{ expense.category }}</td>
-                        <td>{{ expense.date }}</td>
-                        <td> {{ expense.currency }} {{ expense.amount }} </td>
-                        <td>{{ expense.description }}</td>
-                        <td>
-                            <a href="{% url 'finance:edit_expense' expense.id %}" class="edit-btn">EDIT</a>
-                            <a href="{% url 'finance:delete_expense' expense.id %}" class="delete-btn">DELETE</a>
+                        <td data-label="Category">{{ expense.category }}</td>
+                        <td data-label="Date">{{ expense.date }}</td>
+                        <td data-label="Amount">{{ expense.currency }} {{ expense.amount }}</td>
+                        <td data-label="Description">{{ expense.description }}</td>
+                        <td data-label="Action">
+                            <div class="action-buttons">
+                                <a href="{% url 'finance:edit_expense' expense.id %}" class="edit-btn">EDIT</a>
+                                <a href="{% url 'finance:delete_expense' expense.id %}" class="delete-btn">DELETE</a>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="2"><strong>Total Amount:</strong></td>
-                        <td><strong>{{user.currency.currency}} {{ total_amount }}</strong></td>
-                        <td></td>
-                        <td></td>
+                        <td colspan="2" class="total-row"><strong>Total Amount:</strong></td>
+                        <td class="total-row"><strong>{{user.currency.currency}} {{ total_amount }}</strong></td>
+                        <td class="total-row"></td>
+                        <td class="total-row"></td>
                     </tr>
                 </tfoot>
             </table>

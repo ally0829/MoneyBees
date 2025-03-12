@@ -14,43 +14,41 @@
             <form id="expense-form">
                 {% csrf_token %}
                 <input type="hidden" id="payment-id" name="payment_id"> <!-- store current user ID -->
-
+                
                 <label for="date">Select Date</label>
                 <input type="date" id="date" name="date" required>
-
+                
                 <label for="category">Expense Category</label>
                 <select id="category" name="category">
                     {% for category in categories %}
                     <option value="{{ category.id }}">{{ category.name }}</option>
                     {% endfor %}
                 </select>
-
+                
                 <label for="currency">Currency:</label>
                 <select name="currency" id="currency" required>
                     {% for currency_code, rate in exchange_rates.rates.items %}
-                        <option value="{{ currency_code }}" 
-                            {% if currency_code == user.currency.currency %}selected{% endif %}>
+                        <option value="{{ currency_code }}"
+                             {% if currency_code == user.currency.currency %}selected{% endif %}>
                             {{ currency_code }}
                         </option>
                     {% endfor %}
                 </select>
-                
-                
-
+                                   
                 <label for="amount">Amount</label>
                 <input type="number" id="amount" name="amount" placeholder=" 0.0" required>
-
+                
                 <label for="description">Description</label>
                 <textarea id="description" name="description"
                     placeholder="Add some description of the expense..."></textarea>
-
+                
                 <div class="form-buttons">
                     <button type="submit" id="save-btn">OK</button>
                     <button type="button" id="delete-btn" class="hidden">Delete</button>
                 </div>
             </form>
         </div>
-
+        
         <div class="expense-list">
             <table>
                 <thead>
@@ -65,11 +63,11 @@
                 <tbody id="expense-table-body">
                     {% for payment in payments %}
                     <tr data-id="{{ payment.id }}">
-                        <td data-category="{{ payment.category.id }}">{{ payment.category.name }}</td>
-                        <td>{{ payment.date }}</td>
-                        <td>{{payment.currency.currency}}{{ payment.amount }}</td>
-                        <td>{{ payment.description }}</td>
-                        <td class="actions">
+                        <td data-label="Category" data-category="{{ payment.category.id }}">{{ payment.category.name }}</td>
+                        <td data-label="Date">{{ payment.date }}</td>
+                        <td data-label="Amount">{{payment.currency.currency}}{{ payment.amount }}</td>
+                        <td data-label="Notes">{{ payment.description }}</td>
+                        <td data-label="Actions" class="actions">
                             <button class="edit-btn">Edit</button>
                             <button class="paid-btn">Paid</button>
                         </td>

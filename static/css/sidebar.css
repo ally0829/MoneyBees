@@ -14,39 +14,6 @@
   padding: 6px;
   left: 0;
   top: 0;
-  overflow-y: auto;
-}
-
-/* Layout for the sidebar */
-.display {
-  display: grid;
-  grid-template-columns: 16% 1fr;
-  grid-template-rows: auto 1fr;
-  overflow: hidden;
-}
-
-.sidebar {
-  grid-column: 1;
-  height: 100vh;
-  background-color: #000000;
-  color: white;
-  padding: 6px;
-  left: 0;
-  top: 0;
-  overflow-y: auto;
-}
-
-.sidebar::-webkit-scrollbar {
-  width: 5px;
-}
-
-.sidebar::-webkit-scrollbar-track {
-  background: #111;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 10px;
 }
 
 .sidebar ul {
@@ -131,59 +98,131 @@
 }
 
 @media (max-width: 768px) {
+
+  /* Change display to horizontal mode for mobile */
   .display {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
   }
 
   .sidebar {
+    grid-column: 1;
+    grid-row: 1;
     height: auto;
     padding: 10px;
+    overflow-x: auto;
+    /* Enable horizontal scrolling for the entire sidebar */
+    white-space: nowrap;
+    /* Prevent text wrapping */
   }
 
-  .sidebar ul {
-    margin-top: 40px;
-    margin-left: 10px;
-  }
-
-  .sidebar ul li {
-    margin-top: 8px;
-  }
-
+  /* Ensure profile section is visible */
   .sidebar-profile {
-    height: 100px;
-    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: auto;
+    min-height: 80px;
+    margin-bottom: 10px;
+    padding: 5px;
+  }
+
+  .sidebar-profile svg {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 5px;
+  }
+
+  /* Make the menu items display horizontally */
+  .sidebar ul {
+    display: flex;
+    flex-wrap: nowrap;
+    /* Prevent wrapping */
+    overflow-x: auto;
+    /* Enable horizontal scrolling */
+    margin-top: 10px;
+    margin-left: 0;
+    padding-bottom: 10px;
+    /* Space for scrollbar */
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on iOS */
+    width: 100%;
+    scrollbar-width: thin;
+    /* Firefox scrollbar style */
+  }
+
+  /* Remove top margins to prevent elements from dropping down */
+  .sidebar ul li {
+    margin-top: 0;
+    margin-right: 15px;
+    /* Horizontal spacing between items */
+    white-space: nowrap;
+    flex-shrink: 0;
+    /* Prevent items from shrinking */
+  }
+
+  /* Remove special margin-top for Settings button */
+  .sidebar ul li[style*="margin-top: 72px"] {
+    margin-top: 0 !important;
+  }
+
+  /* Custom scrollbar styling */
+  .sidebar ul::-webkit-scrollbar {
+    height: 5px;
+  }
+
+  .sidebar ul::-webkit-scrollbar-track {
+    background: #111;
+  }
+
+  .sidebar ul::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 10px;
+  }
+
+  .sidebar ul::-webkit-scrollbar-thumb:hover {
+    background: #555;
   }
 
   .main {
     grid-column: 1;
-    height: auto;
+    grid-row: 2;
+    height: calc(100vh - 150px);
+    /* Adjust main content height */
   }
 }
 
 @media (max-width: 480px) {
   .sidebar {
-    grid-column: 1;
     padding: 5px;
   }
 
+  .sidebar-profile {
+    min-height: 60px;
+  }
+
+  .sidebar-profile svg {
+    width: 40px;
+    height: 40px;
+  }
+
   .sidebar ul {
-    margin-top: 60px;
-    margin-left: 10px;
+    margin-top: 5px;
   }
 
   .sidebar ul li {
-    margin-top: 6px;
+    margin-right: 12px;
     font-size: 14px;
-  }
-
-  .sidebar-profile {
-    height: 80px;
-    margin-bottom: 12px;
   }
 
   .icon-container {
     padding: 2px 4px 3px 4px;
-    margin-right: 10px;
+    margin-right: 8px;
+  }
+
+  .main {
+    height: calc(100vh - 120px);
   }
 }

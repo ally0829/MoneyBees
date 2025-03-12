@@ -1,7 +1,9 @@
-.form_container{
+.form_container {
     width: 100%;
     display: flex;
     justify-content: center;
+    padding: 15px;
+    box-sizing: border-box;
 }
 
 .add_income_expense {
@@ -9,9 +11,11 @@
     border-radius: 12px;
     padding: 25px;
     width: 65%;
+    max-width: 600px;
     box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
     border: 2px solid #CB9E46;
     text-align: center;
+    box-sizing: border-box;
 }
 
 .add_income_expense h2 {
@@ -31,7 +35,8 @@ label {
     color: #CB9E46;
 }
 
-input, select {
+input,
+select {
     width: 100%;
     padding: 10px;
     margin-top: 3px;
@@ -39,9 +44,11 @@ input, select {
     border-radius: 6px;
     background-color: #FFF9E3;
     font-size: 14px;
+    box-sizing: border-box;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
     border-color: #CB9E46;
     outline: none;
 }
@@ -64,5 +71,50 @@ button {
 }
 
 .btn-primary:hover {
-    background-color: #CB9E46;
+    background-color: #B68E3E;
+}
+
+/* Media queries for responsiveness */
+@media screen and (max-width: 992px) {
+    .add_income_expense {
+        width: 80%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .add_income_expense {
+        width: 90%;
+    }
+
+    .add_income_expense h2 {
+        font-size: 18px;
+        padding: 10px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .form_container {
+        padding: 10px;
+    }
+
+    .add_income_expense {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .add_income_expense h2 {
+        margin: -20px -20px 15px -20px;
+        font-size: 16px;
+    }
+
+    input,
+    select {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    button {
+        padding: 8px;
+        font-size: 14px;
+    }
 }
