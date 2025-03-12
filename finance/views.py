@@ -761,6 +761,7 @@ def expense_targets(request):
                     transaction_date=expense.date
                 )
                 current_spent += converted_amount
+                target_amount += converted_amount
 
             # Calculate progress percentage
             progress = round((current_spent / target_amount) * 100, 2) if target_amount > 0 else 0
