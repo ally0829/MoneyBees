@@ -1,9 +1,4 @@
-body {
-    font-family: 'Merriweather', serif;
-}
-
 .expense-container h2 {
-    font-family: 'Merriweather', serif;
     font-weight: 700;
     font-size: 2rem;
 }
@@ -59,17 +54,14 @@ body {
 .date-filter label,
 .date-filter select,
 .date-filter input {
-    font-family: 'Merriweather', serif;
     font-weight: 400;
 }
 
 .expense-table {
-    font-family: 'Merriweather', serif;
     font-size: 16px;
 }
 
 .edit-btn {
-    font-family: 'Merriweather', serif;
     font-weight: 600;
     background-color: #FFD700;
     border: none;
@@ -94,7 +86,6 @@ body {
 }
 
 .delete-btn {
-    font-family: 'Merriweather', serif;
     font-weight: 600;
     background-color: #FFD700;
     border: none;

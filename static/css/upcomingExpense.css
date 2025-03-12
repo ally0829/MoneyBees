@@ -20,19 +20,7 @@ body {
     /* Fixed position to prevent scrolling */
 }
 
-/* default Merriweather */
-body,
-h1,
-h2,
-h3,
-label,
-input,
-select,
-textarea,
-button,
-table {
-    font-family: 'Merriweather', serif;
-}
+
 
 /* the title */
 h1 {
@@ -146,7 +134,6 @@ textarea {
 .expense-list th,
 .expense-list td {
     font-size: 16px;
-    font-family: 'Merriweather', serif;
     border: 1px solid black;
     padding: 10px;
     text-align: center;
