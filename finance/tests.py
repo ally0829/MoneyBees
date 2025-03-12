@@ -21,7 +21,7 @@ class FinanceModelsTestCase(TestCase):
         self.currency = Currency.objects.create(currency="USD", rate=1.0, timestamp=1698765432)
         self.user = User.objects.create(email="pragati@gmail.com", firstname="*", lastname="Pragati", currency = self.currency)
         self.expense_category = ExpenseCategory.objects.create(name="Food")
-        self.income_category = IncomeCategory.objects.create(name="Salary", description="Monthly salary")
+        self.income_category = IncomeCategory.objects.create(name="Salary")
         
         self.income = Income.objects.create(
             user=self.user,
