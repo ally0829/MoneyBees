@@ -53,7 +53,7 @@ EXCHANGE_RATE_API_KEY = os.environ.get("EXCHANGE_RATE_API_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['pragati14.pythonanywhere.com']
 
 
 # Application definition
@@ -173,13 +173,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-# STATIC_URL = "static/"
-# settings.py
-# AUTO_CONVERT_MONEY = True
-# DEFAULT_CURRENCY = "USD"
-# STATICFILES_DIRS = [
-#    os.path.join(BASE_DIR, "static"),
-# ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
