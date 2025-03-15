@@ -1,6 +1,4 @@
 from django.test import TestCase, Client
-
-# Create your tests here.
 from finance.models import (
     ExpenseCategory, IncomeCategory, Income, Expense, 
     MonthlyExpenseTarget, UpcomingPayment, Currency

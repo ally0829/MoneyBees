@@ -1,8 +1,6 @@
 # import models
 from finance.models import Income, Expense, ExpenseCategory, MonthlyExpenseTarget, IncomeCategory
 from users.models import User
-# import forms
-# from finance.views import fetch_exchange_rates
 from django import forms
 from datetime import date
 

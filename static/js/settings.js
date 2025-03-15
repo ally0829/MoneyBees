@@ -89,16 +89,6 @@ document.getElementById("cancel").onclick = function() {
     document.getElementById("deleteButtonDialog").close();
 }
 
-// document.addEventListener('DOMContentLoaded', function() {
-//     // Add event listeners here
-//     document.getElementById('dlt').addEventListener('click', function() {
-//         console.log("Confirm delete button clicked!");  // Debugging
-//         document.getElementById("deleteButtonDialog").close();  // Close the dialog after click
-//     });
-// });
-
-
-
     // Function to check if the form has changed
 function checkFormChanges() {
     const currentValues = {
@@ -130,13 +120,6 @@ form.querySelectorAll('input, select').forEach(field => {
 
 // Initial check in case the form is pre-filled with changes
 checkFormChanges();
-
-// $(document).ready(function() {
-//     $('#confirmDelete').click(function() {
-//         console.log("Button clicked!"); // Debugging
-//         window.location.href = "/users/login";
-//     });
-// });
 
 
 // Get the CSRF token from the meta tag

@@ -10,5 +10,5 @@ admin.site.register(Income)
 admin.site.register(ExpenseCategory)
 admin.site.register(Expense)
 admin.site.register(MonthlyExpenseTarget)
-admin.site.register(IncomeCategory, IncomeCategoryAdmin)  # 使用自定義 Admin 類
+admin.site.register(IncomeCategory, IncomeCategoryAdmin) 
 admin.site.register(UpcomingPayment)

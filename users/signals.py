@@ -23,7 +23,6 @@ def update_user_profile(sender, instance, created, **kwargs):
         user.firstname = google_data.get('given_name', user.firstname or "Google User")
         user.lastname = google_data.get('family_name', user.lastname or "*")
         user.is_staff = True
-        # print(f"Updating user: {user.email}, is_staff={user.is_staff}, firstname={user.firstname}, lastname={user.lastname}")
         user.save()
 
 

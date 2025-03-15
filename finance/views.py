@@ -359,7 +359,6 @@ def expense_record_view(request):
     # Ensure user has a valid currency
     categories = ExpenseCategory.objects.all()
     expenses = Expense.objects.filter(user=user)
-    # expenses = Expense.objects.filter(user=user)
 
     total_amount = calculate_total_amount(user, expenses)
 
@@ -383,9 +382,6 @@ def expense_record_view(request):
 
     if category and category != "ALL":
         expenses = expenses.filter(category__name=category)
-
-    # total_amount = expenses.aggregate(
-    #     Sum('amount'))['amount__sum']
 
     return render(request, 'finance/expenseRecord.html', {
         'categories': categories,
@@ -692,117 +688,7 @@ def upcoming_expenses(request):
     return JsonResponse({"upcoming_expenses": data})
 
 
-# @csrf_exempt
-# @login_required
-# def expense_targets(request):
-#     user = request.user
-#     today = now().date()
-#     current_year = today.year
-#     current_month = today.month
-
-#     if request.method == "GET":
-#         category_id = request.GET.get("category_id")
-
-#         if category_id:
-#             try:
-#                 category_id = int(category_id)
-#             except ValueError:
-#                 return JsonResponse({"error": "Invalid category_id"}, status=400)
-
-#             target = MonthlyExpenseTarget.objects.filter(
-#                 user=user, category_id=category_id, month=current_month
-#             ).first()
-
-#             if target:
-#                 return JsonResponse({
-#                     "id": target.id,
-#                     "category": target.category.name,
-#                     "target_amount": float(target.amount),
-#                     "month": target.month,
-#                     "currency": user.currency.currency  # Include currency in response
-
-#                 })
-#             else:
-#                 return JsonResponse({"message": "No target found"}, status=404)
-#         # Fetch all targets for the current month
-#         targets = MonthlyExpenseTarget.objects.filter(
-#             user=user, month=current_month)
-#         # Fetch expenses for the current month and group by category
-#         expenses = Expense.objects.filter(user=user, date__year=current_year, date__month=current_month).values(
-#             'category').annotate(total=Sum('amount'))
-#         expense_dict = {expense['category']: expense['total']
-#                         for expense in expenses}
-
-#         data = []
-
-#         # Prepare data for JSON response
-#         for target in targets:
-#             # Convert target amount to the user's default currency
-#             target_amount = convert_to_default_currency(
-#                 amount=target.amount,
-#                 expense_currency=target.currency.currency,  # Assuming target has a currency field
-#                 default_currency=user.currency.currency,
-#                 transaction_date=today  # Use today's date for conversion
-#             )
-
-#             # Initialize current_spent to 0
-#             current_spent = Decimal(0)
-
-#             # Convert current spending to the user's default currency
-#             for expense in Expense.objects.filter(user=user, category=target.category, date__year=current_year, date__month=current_month):
-#                 converted_amount = convert_to_default_currency(
-#                     amount=expense.amount,
-#                     expense_currency=expense.currency.currency,
-#                     default_currency=user.currency.currency,
-#                     transaction_date=expense.date
-#                 )
-#                 current_spent += converted_amount
-
-#             # Calculate progress percentage
-#             progress = round((current_spent / target_amount) * 100, 2) if target_amount > 0 else 0
-
-#             # Append the data for this target
-#             data.append({
-#                 "category": target.category.name,
-#                 "target_amount": float(target_amount),  # Convert Decimal to float for JSON
-#                 "current_spent": float(current_spent),  # Convert Decimal to float for JSON
-#                 "progress": progress,
-#                 "currency": user.currency.currency  # Include currency in response
-#             })
-
-#         return JsonResponse({"expense_targets": data})
-
-#     elif request.method == "POST":
-#         try:
-#             data = json.loads(request.body)
-#             category_id = int(data.get("category"))
-#             amount = float(data.get("amount"))
-#             month_str = data.get("month")
-
-#             category = get_object_or_404(ExpenseCategory, id=category_id)
-
-#             try:
-#                 month = int(month_str.split("-")[1])
-#             except (IndexError, ValueError):
-#                 return JsonResponse({"error": "Invalid month format. Expected YYYY-MM."}, status=400)
-
-#             print(
-#                 f"try to create MonthlyExpenseTarget: User={user.email}, Category={category.name}, Amount={amount}, Month={month}")
-
-#             target = MonthlyExpenseTarget.objects.create(
-#                 user=user,
-#                 category=category,
-#                 amount=amount,
-#                 month=month
-#             )
-
-#             print(f"Success: {target}")
-
-#             return JsonResponse({"message": "Success", "id": target.id}, status=201)
-
-#         except Exception as e:
-#             print(f"Error: {e}")
-#             return JsonResponse({"error": str(e)}, status=400)@csrf_exempt
+@csrf_exempt
 @login_required
 def expense_targets(request):
     user = request.user
@@ -913,10 +799,8 @@ def expense_targets(request):
             category_id = int(data.get("category"))
             amount = float(data.get("amount"))
             month_str = data.get("month")
-            # currency_code = user  # Get the currency from the request
 
             category = get_object_or_404(ExpenseCategory, id=category_id)
-            # currency = get_object_or_404(Currency, currency=currency_code)  # Fetch the Currency object
 
             try:
                 month = int(month_str.split("-")[1])
@@ -930,10 +814,6 @@ def expense_targets(request):
 
             if existing_target:
                 return JsonResponse({"error": "Target for this category and month already exists."}, status=400)
-
-            # print(
-            #     f"Creating MonthlyExpenseTarget: User={user.email}, Category={category.name}, Amount={amount}, Month={month}, Currency={currency.currency}"
-            # )
 
             # Create new target
             target = MonthlyExpenseTarget.objects.create(

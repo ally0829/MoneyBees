@@ -14,6 +14,20 @@
   padding: 6px;
   left: 0;
   top: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.sidebar::-webkit-scrollbar {
+  width: 6px; 
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #666;  
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #888;
 }
 
 .sidebar ul {
