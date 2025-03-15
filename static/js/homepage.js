@@ -264,7 +264,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 const categorySelect = document.getElementById("categorySelect");
-                categorySelect.innerHTML = data.categories.map(category =>
+                categorySelect.innerHTML = '<option value="">-- Select the Category --</option>';
+                categorySelect.innerHTML += data.categories.map(category =>
                     `<option value="${category.id}">${category.name}</option>`
                 ).join('');
             })

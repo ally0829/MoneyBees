@@ -68,6 +68,8 @@ class MonthlyExpenseTarget(models.Model):
     category = models.ForeignKey(ExpenseCategory, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     month = models.IntegerField()
+    currency = models.ForeignKey(
+        Currency, to_field="currency", on_delete=models.SET_NULL, null=True)  # Add this field
 
     class Meta:
         verbose_name_plural = "monthly_expense_target"
